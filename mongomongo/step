@@ -1,0 +1,66 @@
+```
+$docker network ls
+$docker network create mongo_replica
+$openssl rand -base64 741 > mongo-keyfile2
+$chmod 600 mongo-keyfile
+$docker build -t mongoreplica:1.0 .
+```
+
+Run three container for mongodb
+```
+$docker run --name mongo-a --net mongo_replica \
+-v /Users/kate_hung/Documents/dockershare/mongo1:/data/db -p 27017:27017 \
+-it mongoreplica:1.0 --auth --keyFile /opt/keyfile/mongo-keyfile --replSet mongo-set
+```
+
+```
+$docker run --name mongo-b --net mongo_replica \
+-v /Users/kate_hung/Documents/dockershare/mongo2:/data/db -p 27018:27017 \
+-it mongoreplica:1.0 --auth --keyFile /opt/keyfile/mongo-keyfile --replSet mongo-set
+```
+
+```
+$docker run --name mongo-c --net mongo_replica \
+-v /Users/kate_hung/Documents/dockershare/mongo3:/data/db -p 27019:27017 \
+-it mongoreplica:1.0 --auth --keyFile /opt/keyfile/mongo-keyfile --replSet mongo-set
+```
+
+Set the configuration for replication set
+```
+$docker exec -it mongo-a mongo
+$config={
+	"_id" : "mongo-set",
+	"members" : [
+		{
+			"_id" : 0,
+			"host" : "mongo-a:27017"
+		},
+		{
+			"_id" : 1,
+			"host" : "mongo-b:27017"
+		},
+		{
+			"_id" : 2,
+			"host" : "mongo-c:27017"
+		}
+	]
+}
+$rs.initiate(config)
+```
+
+connect the DB and inspect the configuration of replication ser
+
+```
+$db = (new Mongo('localhost:27017')).getDB('test')
+$db.isMaster()
+```
+
+connect to secondary 
+```
+db2 = (new Mongo('mongo2:27017')).getDB('test')
+db2.setSlaveOk()  <<< allow read operations to run on secondary nodes, default is false
+db2.users.find()
+```
+ref:
+http://marklin-blog.logdown.com/posts/1394457-30-22-mongodb-replica-set-replica-set-2-using-the-docker-build-mongodb-cluster
+https://blog.toright.com/posts/4508/mongodb-replica-set-高可用性架構搭建.html

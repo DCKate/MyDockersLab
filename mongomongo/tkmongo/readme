@@ -1,0 +1,26 @@
+use docker for mongo
+```
+$docker run --name some-mongo -v /Users/kate_hung/Documents/dockershare/mongo:/data/db -p 27017:27017 -it mongo:3.4.14-jessie --auth
+$db.createUser({
+... user:'admin_mongo',
+... pwd:'pass_mongo',
+... roles:[{
+... role:'userAdminAnyDatabase',
+... db:'admin'}]
+... })
+```
+and then logout 
+
+```
+$docker exec -it some-mongo mongo admin 
+$db.auth("admin_mongo","pass_mongo")
+$db.createUser({
+... user:"kk",
+... pwd:"pass",
+... roles:[{ role:"readWrite",db:"testlog"}]
+... })
+
+```
+
+ref:
+https://godoc.org/gopkg.in/mgo.v2
