@@ -4,9 +4,9 @@ $docker run --name some-mongo -v /Users/kate_hung/Documents/dockershare/mongo:/d
 $db.createUser({
 ... user:'admin_mongo',
 ... pwd:'pass_mongo',
-... roles:[{
-... role:'userAdminAnyDatabase',
-... db:'admin'}]
+... roles:[
+... {role:'userAdminAnyDatabase',db:'admin'},
+... {role:'root',db:'admin'}]
 ... })
 ```
 and then logout 

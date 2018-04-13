@@ -1,3 +1,5 @@
+Construct the repliaction set
+
 ```
 $docker network ls
 $docker network create mongo_replica

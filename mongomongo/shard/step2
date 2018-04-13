@@ -1,0 +1,32 @@
+Construct the shard with replication set
+
+Create 3 replication set, 2 for shard, 1 for config
+```
+//router image
+$docker build --force-rm -t mongos:1.0 .
+//config image
+$docker build --force-rm -t rs_c:1.0 .
+//shard image
+$docker build --force-rm -t rs_da:1.0 .
+$docker build --force-rm -t rs_db:1.0 .
+```
+create 3 replication set ....
+```
+$docker run --name rs_da1 --net mongo_replica -v /Users/kate_hung/Documents/dockershare/rs_da1:/data/db \
+-it rs_da:1.0 --config /etc/mongod.conf
+$docker exec -it rs_da1 mongo localhost:27018 
+$config={ "_id":"rs-da", "members" : [ {"_id":0,"host":"rs_da1:27018"}, {"_id":1,"host":"rs_da2:27018"}, {"_id":2,"host":"rs_da3:27018"}]}
+$rs.initiate(config)
+```
+
+create 1 router
+```
+$docker run --name router --net mongo_replica -v /Users/kate_hung/Documents/dockershare/router:/data/db \
+-p 27017:27017 -it mongos:1.0 mongos --configdb rs-c/rs_c1:27019,rs_c2:27019,rs_c3:27019 --port 27017 \
+--keyFile /opt/keyfile/mongo-keyfile
+```
+In mongos
+use admin
+db.auth("admin_mongo","pass_mongo")
+sh.addShard("rs-da/rs_da1:27018,rs_da2:27018,rs_da3:27018")
+sh.addShard("rs-db/rs_db1:27018,rs_db2:27018,rs_db3:27018")
