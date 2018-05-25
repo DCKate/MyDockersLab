@@ -1,3 +1,6 @@
 # MyDockersLab
 
-All of the dockerfile I write to build some services.
+## mongodb:
+* dockerfile: how to run replica set and shard
+* ansible: include replica set and shard without docker
+

@@ -1,0 +1,40 @@
+---
+- name: Create MongoDB root user siteRootAdmin
+  mongodb_user:
+    login_port: "27017"
+    database: "admin"
+    name: "{{ mongodb_admin_user }}"
+    password: "{{ mongodb_admin_password }}"
+    roles: "root"
+
+- name: Create MongoDB administrative user siteUserAdmin
+  mongodb_user:
+    login_user: "{{ mongodb_admin_user }}"
+    login_password: "{{ mongodb_admin_password }}"
+    login_port: "27017"
+    database: "e-gov"
+    name: "{{ mongodb_user }}"
+    password: "{{ mongodb_password }}"
+    roles:
+      - { db: "admin", role: "readWrite" }
+      - { db: "{{ mongodb_database }}", role: "readWrite" }
+
+- name: Create MongoDB backup user siteUserBackup
+  mongodb_user:
+    login_user: "{{ mongodb_admin_user }}"
+    login_password: "{{ mongodb_admin_password }}"
+    login_port: "27017"
+    database: "e-gov"
+    name: "{{ mongodb_backup_user }}"
+    password: "{{ mongodb_backup_password }}"
+    roles:
+      - { db: "admin", role: "backup" }
+
+- name: Create root user for MongoDB 
+  mongodb_user:
+    database: admin
+    name: root
+    password: root_passwd
+    roles: readWrite,dbAdmin,userAdmin
+    state: present
+

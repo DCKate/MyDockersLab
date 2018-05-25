@@ -1,0 +1,8 @@
+---
+- name: Create root user for MongoDB 
+  mongodb_user:
+    database: admin
+    name: root
+    password: root_passwd
+    roles: readWrite,dbAdmin,userAdmin
+    state: present

@@ -1,0 +1,5 @@
+---
+- name: Install mongo
+  hosts: all
+  roles:
+   - role: common
