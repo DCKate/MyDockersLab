@@ -1,8 +1,24 @@
 ---
-- name: Create root user for MongoDB 
-  mongodb_user:
-    database: admin
-    name: root
-    password: root_passwd
-    roles: readWrite,dbAdmin,userAdmin
-    state: present
+- name: Create directory
+  file: path=/opt/confile/ state=directory
+  become: yes
+
+- name: render mongo replicat_set config
+  template: 
+    src: mongod.conf.j2
+    dest: /opt/confile/mongod.conf
+  become: yes
+  notify: restart replica set for MongoDB
+
+# - name: Create soft link for mongoDB
+#   file: src=/opt/confile/mongod.conf dest=/etc/mongod.conf state=link
+#   become: yes
+
+# - name: Create root user for MongoDB 
+#   mongodb_user:
+#     database: admin
+#     name: root
+#     password: root_passwd
+#     roles: readWrite,dbAdmin,userAdmin
+#     state: present
+#   notify: restart replica set for MongoDB 

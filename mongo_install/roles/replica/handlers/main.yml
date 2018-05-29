@@ -1,0 +1,9 @@
+---
+- name: restart replica set for MongoDB 
+  command: mongod --config /etc/mongod.conf
+  become: yes
+# - name: restart replica set for MongoDB 
+#   service:
+#     name: mongo
+#     state: restarted
+#   become: yes

@@ -1,5 +1,6 @@
-Construct the repliaction set
+##Construct the repliaction set
 
+#Create docker network and build image
 ```
 $docker network ls
 $docker network create mongo_replica
@@ -8,7 +9,7 @@ $chmod 600 mongo-keyfile
 $docker build -t mongoreplica:1.0 .
 ```
 
-Run three container for mongodb
+#Run three container for mongodb
 ```
 $docker run --name mongo-a --net mongo_replica \
 -v /Users/kate_hung/Documents/dockershare/mongo1:/data/db -p 27017:27017 \
@@ -27,7 +28,7 @@ $docker run --name mongo-c --net mongo_replica \
 -it mongoreplica:1.0 --auth --keyFile /opt/keyfile/mongo-keyfile --replSet mongo-set
 ```
 
-Set the configuration for replication set
+#Set the configuration for replication set
 ```
 $docker exec -it mongo-a mongo
 $config={
@@ -50,14 +51,13 @@ $config={
 $rs.initiate(config)
 ```
 
-connect the DB and inspect the configuration of replication ser
-
+#connect the DB and inspect the configuration of replication ser
 ```
 $db = (new Mongo('localhost:27017')).getDB('test')
 $db.isMaster()
 ```
 
-connect to secondary 
+#connect to secondary 
 ```
 db2 = (new Mongo('mongo2:27017')).getDB('test')
 db2.setSlaveOk()  <<< allow read operations to run on secondary nodes, default is false

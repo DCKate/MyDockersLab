@@ -12,3 +12,11 @@
     name: mongodb-org
     update_cache: yes
   become: yes
+
+- name: Create root user for MongoDB 
+  mongodb_user:
+    database: admin
+    name: "{{ mongodb_admin_user }}"
+    password: "{{ mongodb_admin_password }}"
+    roles: readWrite,dbAdmin,userAdmin
+    state: present

@@ -3,3 +3,8 @@
   hosts: all
   roles:
    - role: common
+
+- name: Config Replica
+  hosts: replica
+  roles:
+   - role: replica
