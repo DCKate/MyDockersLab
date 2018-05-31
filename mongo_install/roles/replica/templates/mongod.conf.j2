@@ -28,12 +28,10 @@ net:
 processManagement:
     fork: true
 
-
+{% if enable_service %}
 security:
     keyFile: "{{ ansible_env.HOME }}/opt/confile/mongo-keyfile"
-{% if enable_service %}
     authorization: "enabled"
-{% endif %}
 
 replication:
     oplogSizeMB: 10240
@@ -41,6 +39,7 @@ replication:
 
 sharding:
     clusterRole: "{{ cluster_role }}"
+{% endif %}
 
 #operationProfiling:
 

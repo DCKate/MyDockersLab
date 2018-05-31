@@ -1,5 +1,12 @@
 ---
-- name: restart service
-  command: mongod --config  {{ ansible_env.HOME }}/opt/confile/mongod-{{ replica_name }}.conf
-  listen: restart service
-  
+- name: Set server SlaveOk
+  command: mongo localhost:{{ port }} -u {{ mongodb_user }} -p {{ mongodb_password }} --eval "rs.slaveOk()"
+  listen: initial rs calling
+
+- name: Check master server
+  command: mongo localhost:{{ port }} -u {{ mongodb_admin_user }} -p {{ mongodb_admin_password }} --eval "printjson(db.isMaster())"
+  listen: initial rs calling
+  register: is_master
+
+- debug: "var=is_master"
+  listen: initial rs calling

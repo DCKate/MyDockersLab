@@ -1,0 +1,31 @@
+---
+- name: Create directory
+  file: path={{ item }} state=directory mode=0777
+  with_items:
+    - "testfolder/"
+
+- name: Get server from configure
+  set_fact:
+    rs_items: "{{ rs_items|default({}) | combine( item.value ) }}"
+  with_dict: "{{ replica_set }}"
+  when: replica_name == item.key
+
+- name: Generate server unit config for replica_set 
+  set_fact:
+    rs_server_config: '{{ rs_server_config|default([]) }}+[{"_id":{{ item.value.id }},"host":"{{ item.value.address }}:{{ item.value.port }}","priority":{{ item.value.priority }}}]'
+  with_dict:
+    - "{{ rs_items }}"
+
+- name: Combine server for replica_set 
+  set_fact:
+    rs_config: '{{ rs_server_config | to_json }}'
+  
+- name: Render replicat_set config and wait for calling rs.initiate
+  template: 
+    src: replica.js.j2
+    dest: "testfolder/{{ item.0.name }}-{{ item.1 }}.js"
+  with_subelements:
+    - "{{ hosts_set }}"
+    - ip
+  notify: debug variable
+

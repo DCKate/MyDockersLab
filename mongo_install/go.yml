@@ -1,15 +1,21 @@
 ---
-- name: Install mongo
-  hosts: all
-  roles:
-   - role: common
+# - name: Install mongo
+#   hosts: mongo
+#   roles:
+#    - role: common
 
-- name: Config Replica
+- name: Config Replica and Init Replica
   hosts: replica
   roles:
    - role: replica
-
-- name: Init Replica
-  hosts: replica
-  roles:
    - role: replica_up
+
+# - name: Init Replica
+#   hosts: replica
+#   roles:
+#    - role: replica_up
+
+- name: local test use
+  hosts: localserver
+  roles:
+   - role: localtest

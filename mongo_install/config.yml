@@ -4,10 +4,17 @@ replica_set:
       id: 0
       address: "192.168.33.10"
       port: 27018
-      priority: 1
     atom2:
       id: 1
       address: "192.168.33.11"
       port: 27018
-      priority: 0
+  replica_sb:
+    atom1:
+      id: 0
+      address: "192.168.33.10"
+      port: 27019
+    atom2:
+      id: 1
+      address: "192.168.33.11"
+      port: 27019
               

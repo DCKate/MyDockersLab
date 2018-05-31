@@ -1,10 +1,38 @@
 ---
-- name: Create replicat_set config for MongoDB
-  include: create_replica_config.yml
+- name: Get server from configure
+  set_fact:
+    rs_items: "{{ rs_items|default({}) | combine( item.value ) }}"
+  with_dict: "{{ replica_set }}"
+  when: replica_name == item.key
 
-- name: Create user for MongoDB
-  include: create_user.yml
+- debug: "var=rs_items"
 
-- name: Stop server to enable auth
-  command: mongo localhost:{{ port }}/admin -u {{ mongodb_admin_user }} -p {{ mongodb_admin_password }} --eval "printjson(db.shutdownServer())"
-  notify: restart service
+- name: Generate server unit config for replica_set 
+  set_fact:
+    rs_server_config: '{{ rs_server_config|default([]) }}+["{{ item.value.address }}:{{ item.value.port }}"]'
+  with_dict:
+    - "{{ rs_items }}"
+
+- debug: "var=rs_server_config"
+
+- name: Render replicat_set config and wait for calling rs.initiate
+  template: 
+    src: replica.js.j2
+    dest: "{{ ansible_env.HOME }}/opt/confile/replica.js"
+  when: set_config
+
+- name: Initialize the replication set
+  command: mongo localhost:{{ port }} -u {{ mongodb_admin_user }} -p {{ mongodb_admin_password }} --authenticationDatabase "admin" {{ ansible_env.HOME }}/opt/confile/replica.js 
+  when: set_config
+
+# - name: Set server SlaveOk
+#   command: mongo localhost:{{ port }} -u {{ mongodb_user }} -p {{ mongodb_password }} --eval "rs.slaveOk()"
+#   register: slave_ok
+
+# - debug: "var=slave_ok"
+
+- name: Check master server
+  command: mongo localhost:{{ port }} -u {{ mongodb_user }} -p {{ mongodb_password }} --eval "printjson(db.isMaster())"
+  register: is_master
+
+- debug: "var=is_master"

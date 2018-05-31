@@ -11,9 +11,12 @@
   with_items:
     - { src: mongo-keyfile, name: mongo-keyfile , mode: "0600" }
 
-- name: Set varible for disable auth
+- name: Create user for MongoDB
+  include: create_user.yml
+
+- name: Set varible to enable auth
   set_fact: 
-    enable_service: false
+    enable_service: true
 
 - name: Render mongo replicat_set config 
   template: 
@@ -22,18 +25,4 @@
 
 - name: Start replica set for MongoDB to set user
   command: mongod --config  {{ ansible_env.HOME }}/opt/confile/mongod-{{ replica_name }}.conf
-  notify: render config for security replica_set
 
-- name: Set varible to enable auth
-  set_fact: 
-    enable_service: true
-
-
-# - name: Restart replica set for MongoDB 
-#   command: mongod --config  /opt/confile/mongod-{{ replica_name }}.conf
-#   become: yes
-  # notify: set role for server 
-
-# - name: Create soft link for mongoDB
-#   file: src=/opt/confile/mongod.conf dest=/etc/mongod.conf state=link
-#   become: yes

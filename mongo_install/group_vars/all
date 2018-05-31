@@ -2,3 +2,7 @@ mongodb_admin_user: root
 
 mongodb_admin_password: root_passwd
 
+mongodb_user: kk
+
+mongodb_password: kk_passwd
+
