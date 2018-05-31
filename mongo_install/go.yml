@@ -8,3 +8,8 @@
   hosts: replica
   roles:
    - role: replica
+
+- name: Init Replica
+  hosts: replica
+  roles:
+   - role: replica_up

@@ -1,0 +1,56 @@
+---
+- name: Get server from configure
+  set_fact:
+    rs_items: "{{ rs_items|default({}) | combine( item.value ) }}"
+  with_dict: "{{ replica_set }}"
+  when: replica_name == item.key
+
+- debug: "var=rs_items"
+
+- name: Generate server unit config for replica_set 
+  set_fact:
+    rs_server_config: '{{ rs_server_config|default([]) }}+[{"_id":{{ item.value.id }},"host":"{{ item.value.address }}:{{ item.value.port }}","priority":{{ item.value.priority }}}]'
+  with_dict:
+    - "{{ rs_items }}"
+
+- debug: "var=rs_server_config"
+
+- name: Combine server for replica_set 
+  set_fact:
+    rs_config: '{{ rs_server_config | to_json }}'
+
+- debug: "var=rs_config"
+
+- name: Render replicat_set config and wait for calling rs.initiate
+  template: 
+    src: replica.js.j2
+    dest: "{{ ansible_env.HOME }}/opt/confile/replica.js"
+  when: is_master
+  become: yes
+
+- name: Initialize the replication set
+  command: mongo localhost:{{ port }} {{ ansible_env.HOME }}/opt/confile/replica.js
+  when: is_master
+  become: yes
+
+# - name: Set master server
+#   command: mongo localhost:{{ port }} --eval "printjson(db.isMaster())"
+#   when: is_master
+
+# - name: Set slave server
+#   command: mongo localhost:{{ port }} --eval "printjson(db.getMongo().setSlaveOk())"
+#   when: is_master
+
+# - name: Set configure for replica_set 
+#   set_fact:
+#     replica_set_config: "{ \"_id\":\"{{ replica_name }}\", \"members\" :{{ rs_server_config }} }"
+#   with_dict:
+#     - "{{ rs_items }}"
+
+# - name: Initiate replica set
+#   command: mongo localhost:{{ port }}/{{ db_name }} --eval "printjson(rs.initiate({{ rs_server_config }}));"
+#   when: is_master
+#   register: initiate
+#   become: yes
+
+# - debug: "var=initiate.stdout"

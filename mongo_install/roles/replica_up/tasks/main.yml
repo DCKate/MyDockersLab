@@ -1,0 +1,10 @@
+---
+- name: Create replicat_set config for MongoDB
+  include: create_replica_config.yml
+
+- name: Create user for MongoDB
+  include: create_user.yml
+
+- name: Stop server to enable auth
+  command: mongo localhost:{{ port }}/admin -u {{ mongodb_admin_user }} -p {{ mongodb_admin_password }} --eval "printjson(db.shutdownServer())"
+  notify: restart service

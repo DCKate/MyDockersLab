@@ -1,4 +1,17 @@
 ---
+- name: apt-get install
+  apt: name={{ item }} update_cache=yes cache_valid_time=3600
+  become: yes
+  with_items:
+    - python-dev
+    - python-pip
+
+- name: pip install
+  pip: name={{ item }}
+  become: yes
+  with_items:
+    - pymongo
+
 - name: Import the public key used by the package management system
   command: apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 0C49F3730359A14518585931BC711F9BA15703C6
   become: yes
@@ -13,10 +26,8 @@
     update_cache: yes
   become: yes
 
-- name: Create root user for MongoDB 
-  mongodb_user:
-    database: admin
-    name: "{{ mongodb_admin_user }}"
-    password: "{{ mongodb_admin_password }}"
-    roles: readWrite,dbAdmin,userAdmin
-    state: present
+# - name: start replica set for MongoDB 
+#   command: mongod --config /etc/mongod.conf
+#   become: yes
+#   notify: Create root user for MongoDB
+  

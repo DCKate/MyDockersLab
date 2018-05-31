@@ -1,22 +1,13 @@
-all:
-  hosts:
+replica_set:
+  replica_sa:
     atom1:
-      ansible_ssh_host: 192.168.33.10
+      id: 0
+      address: "192.168.33.10"
+      port: 27018
+      priority: 1
     atom2:
-      ansible_ssh_host: 192.168.33.11
-  vars:
-    ansible_ssh_port: 22 
-    ansible_ssh_private_key_file: 
-    ansible_user: ubuntu
-  children:
-    replica:
-      children:
-        replica_sa:
-          hosts:
-            atom1:
-            atom2:
-          vars:
-            replica_name: "rs-a"
-            domain: "0.0.0.0"
-            port: 27018
-            clusterRole: "shardsvr"
+      id: 1
+      address: "192.168.33.11"
+      port: 27018
+      priority: 0
+              

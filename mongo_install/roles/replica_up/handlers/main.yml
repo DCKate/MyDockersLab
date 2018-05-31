@@ -1,0 +1,5 @@
+---
+- name: restart service
+  command: mongod --config  {{ ansible_env.HOME }}/opt/confile/mongod-{{ replica_name }}.conf
+  listen: restart service
+  

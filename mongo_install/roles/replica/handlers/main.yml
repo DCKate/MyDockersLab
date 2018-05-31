@@ -1,9 +1,23 @@
 ---
-- name: restart replica set for MongoDB 
-  command: mongod --config /etc/mongod.conf
-  become: yes
-# - name: restart replica set for MongoDB 
-#   service:
-#     name: mongo
-#     state: restarted
+- name: Render mongo replicat_set config and wait for replica_up
+  template: 
+    src: mongod.conf.j2
+    dest: "{{ ansible_env.HOME }}/opt/confile/mongod-{{ replica_name }}.conf"
+  listen: render config for security replica_set
+# - name: Set master server
+#   command: mongo localhost:{{ port }}/{{ db_name }} --eval "printjson(db.isMaster())"
+#   when: is_master
+#   register: masterout
+#   listen: set role for server
 #   become: yes
+
+# - debug: "msg=masterout.stdout"
+
+# - name: Set slave server
+#   command: mongo localhost:{{ port }}/{{ db_name }} --eval "printjson(db.getMongo().setSlaveOk())"
+#   when: not is_master
+#   register: slaveout
+#   listen: set role for server
+#   become: yes
+
+# - debug: "msg=slaveout.stdout"

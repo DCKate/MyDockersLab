@@ -5,7 +5,7 @@
 
 # Where and how to store data.
 storage:
-  dbPath: /data/db
+  dbPath: {{ db_path }}
   directoryPerDB: true
   journal:
     enabled: true
@@ -17,28 +17,32 @@ storage:
 systemLog:
   destination: file
   logAppend: true
-  path: /var/log/mongodb/mongod.log
+  path: /home/vagrant/opt/confile/mongodb/mongod.log
 
 # network interfaces
 net:
-  port: {{ item.value.port }}
-  bindIp: {{ item.value.domain }}
+  port: {{ port }}
+  bindIp: {{ domain }}
 
 
-#processManagement:
+processManagement:
+    fork: true
+
 
 security:
-    keyFile: "/opt/confile/mongo-keyfile"
+    keyFile: "{{ ansible_env.HOME }}/opt/confile/mongo-keyfile"
+{% if enable_service %}
     authorization: "enabled"
-
-#operationProfiling:
+{% endif %}
 
 replication:
     oplogSizeMB: 10240
-    replSetName: "{{ item.value.replica_name }}"
+    replSetName: "{{ replica_name }}"
 
 sharding:
-    clusterRole: "{{ item.value.clusterRole }}"
+    clusterRole: "{{ cluster_role }}"
+
+#operationProfiling:
 
 ## Enterprise-Only Options:
 
