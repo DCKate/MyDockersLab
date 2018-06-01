@@ -9,11 +9,11 @@ replica_set:
       address: "192.168.33.11"
       port: 27018
   replica_sb:
-    atom1:
+    atom3:
       id: 0
       address: "192.168.33.10"
       port: 27019
-    atom2:
+    atom4:
       id: 1
       address: "192.168.33.11"
       port: 27019

@@ -10,5 +10,10 @@ $vagrant up
 ```
 2. run ansible
 ```
-$ansible-playbook  -i hosts.yml go.yml -e@config.yml
+$ansible-playbook  -i hosts.yml go.yml -e@config.yml -l mongo
+```
+
+*Run test role use:
+```
+$ansible-playbook  -i roles/localtest/files/hosts.yml go.yml -e@roles/localtest/files/config.yml -l localserver
 ```

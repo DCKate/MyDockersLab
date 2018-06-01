@@ -1,10 +1,4 @@
 ---
-# - name: Set master server
-#   command: mongo localhost:{{ port }} --eval "printjson(db.isMaster())"
-#   register: is_master
-
-# - debug:
-#       var: is_master
 - name: Set varible for disable auth
   set_fact: 
     enable_service: false

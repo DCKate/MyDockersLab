@@ -25,9 +25,4 @@
     name: mongodb-org
     update_cache: yes
   become: yes
-
-# - name: start replica set for MongoDB 
-#   command: mongod --config /etc/mongod.conf
-#   become: yes
-#   notify: Create root user for MongoDB
   

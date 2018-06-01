@@ -18,18 +18,19 @@
 - name: Render replicat_set config and wait for calling rs.initiate
   template: 
     src: replica.js.j2
-    dest: "{{ ansible_env.HOME }}/opt/confile/replica.js"
+    dest: "{{ ansible_env.HOME }}/opt/confile/{{ replica_name }}.js"
   when: set_config
 
 - name: Initialize the replication set
-  command: mongo localhost:{{ port }} -u {{ mongodb_admin_user }} -p {{ mongodb_admin_password }} --authenticationDatabase "admin" {{ ansible_env.HOME }}/opt/confile/replica.js 
+  command: mongo localhost:{{ port }} -u {{ mongodb_admin_user }} -p {{ mongodb_admin_password }} --authenticationDatabase "admin" {{ ansible_env.HOME }}/opt/confile/{{ replica_name }}.js 
   when: set_config
 
-# - name: Set server SlaveOk
-#   command: mongo localhost:{{ port }} -u {{ mongodb_user }} -p {{ mongodb_password }} --eval "rs.slaveOk()"
-#   register: slave_ok
+- name: Set server SlaveOk
+  command: mongo localhost:{{ port }} -u {{ mongodb_user }} -p {{ mongodb_password }} --eval "printjson(db.getMongo().setSlaveOk())"
+  when: not set_config
+  register: set_slave
 
-# - debug: "var=slave_ok"
+- debug: "var=set_slave"
 
 - name: Check master server
   command: mongo localhost:{{ port }} -u {{ mongodb_user }} -p {{ mongodb_password }} --eval "printjson(db.isMaster())"
