@@ -6,15 +6,15 @@
 - name: Render mongo replicat_set config 
   template: 
     src: mongod.conf.j2
-    dest: "{{ ansible_env.HOME }}/opt/confile/mongod-{{ replica_name }}.conf"
+    dest: "{{ ansible_env.HOME }}/opt/confile/mongod-{{ now_item.value.replica_name }}.conf"
 
 - name: Start replica set for MongoDB to set user
-  command: mongod --config  {{ ansible_env.HOME }}/opt/confile/mongod-{{ replica_name }}.conf
+  command: mongod --config  {{ ansible_env.HOME }}/opt/confile/mongod-{{ now_item.value.replica_name }}.conf
 
 - name: Create root user for MongoDB 
   mongodb_user:
     database: admin
-    login_port: "{{ port }}"
+    login_port: "{{ now_item.value.port }}"
     name: "{{ mongodb_admin_user }}"
     password: "{{ mongodb_admin_password }}"
     roles:
@@ -26,16 +26,16 @@
   mongodb_user:
     login_user: "{{ mongodb_admin_user }}"
     login_password: "{{ mongodb_admin_password }}"
-    login_port: "{{ port }}"
-    database: "{{ db_name }}"
+    login_port: "{{ now_item.value.port }}"
+    database: "{{ now_item.value.db_name }}"
     name: "{{ mongodb_user }}"
     password: "{{ mongodb_password }}"
     roles:
-      - { db: "{{ db_name }}", role: "readWrite" }
+      - { db: "{{ now_item.value.db_name }}", role: "readWrite" }
     state: present
 
 - name: Stop server to enable auth
-  command: mongo localhost:{{ port }}/admin --eval "printjson(db.shutdownServer())"
+  command: mongo localhost:{{ now_item.value.port }}/admin --eval "printjson(db.shutdownServer())"
 
 # - name: Create MongoDB root user siteRootAdmin
 #   mongodb_user:

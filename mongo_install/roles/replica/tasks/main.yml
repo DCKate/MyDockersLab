@@ -1,9 +1,17 @@
 ---
+- name: Get server from configure
+  set_fact:
+    now_item: "{{ item }}"
+  with_dict: "{{ rs_conf }}"
+  when: inventory_hostname == item.key
+
+- debug: "var=now_item"
+
 - name: Create directory
   file: path={{ item }} state=directory mode=0777
   with_items:
     - "{{ ansible_env.HOME }}/opt/confile/mongodb/"
-    - "{{ db_path }}"
+    - "{{ now_item.value.db_path }}"
   become: yes
 
 - name: Copy key file for mongo
@@ -21,8 +29,8 @@
 - name: Render mongo replicat_set config 
   template: 
     src: mongod.conf.j2
-    dest: "{{ ansible_env.HOME }}/opt/confile/mongod-{{ replica_name }}.conf"
+    dest: "{{ ansible_env.HOME }}/opt/confile/mongod-{{ now_item.value.replica_name }}.conf"
 
 - name: Start replica set for MongoDB to set user
-  command: mongod --config  {{ ansible_env.HOME }}/opt/confile/mongod-{{ replica_name }}.conf
+  command: mongod --config  {{ ansible_env.HOME }}/opt/confile/mongod-{{ now_item.value.replica_name }}.conf
 

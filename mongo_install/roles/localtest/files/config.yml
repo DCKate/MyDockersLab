@@ -10,7 +10,24 @@ replica_set:
       address: "192.168.33.11"
       port: 27018
       priority: 0
-              
+
+replica:
+  atom:
+    address: "192.168.33.10"
+    port: 27018
+    db_name: "test"
+    db_path: "/data/db/rs-a"
+    replica_name: "replica_sa"
+    domain: "0.0.0.0"
+    cluster_role: "shardsvr"
+  localrun:
+    address: "192.168.33.11"
+    port: 27018
+    db_path: "/data/db/rs-a"
+    replica_name: "replica_sa"
+    domain: "0.0.0.0"
+    cluster_role: "shardsvr"
+
 hosts_set:
   - name: rs-a
     ip:

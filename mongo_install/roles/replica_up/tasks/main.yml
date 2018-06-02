@@ -1,39 +1,38 @@
 ---
+# - name: Get server from configure
+#   set_fact:
+#     rs_items: "{{ rs_items|default({}) | combine( rs_conf.value ) }}"
+#   with_dict: "{{ rs_conf }}"
+#   # when: replica_name == item.key
+
+# - debug: "var=rs_items"
 - name: Get server from configure
   set_fact:
-    rs_items: "{{ rs_items|default({}) | combine( item.value ) }}"
-  with_dict: "{{ replica_set }}"
-  when: replica_name == item.key
+    now_item: "{{ item }}"
+  with_dict: "{{ rs_conf }}"
+  when: inventory_hostname == item.key
 
-- debug: "var=rs_items"
+- name: Clean rs_server_config
+  set_fact:
+    rs_server_config: []
 
 - name: Generate server unit config for replica_set 
   set_fact:
-    rs_server_config: '{{ rs_server_config|default([]) }}+["{{ item.value.address }}:{{ item.value.port }}"]'
+    rs_server_config: '{{ rs_server_config }}+["{{ item.value.address }}:{{ item.value.port }}"]'
   with_dict:
-    - "{{ rs_items }}"
+    - "{{ rs_conf }}"
 
 - debug: "var=rs_server_config"
 
 - name: Render replicat_set config and wait for calling rs.initiate
   template: 
     src: replica.js.j2
-    dest: "{{ ansible_env.HOME }}/opt/confile/{{ replica_name }}.js"
+    dest: "{{ ansible_env.HOME }}/opt/confile/{{ now_item.value.replica_name }}.js"
   when: set_config
 
 - name: Initialize the replication set
-  command: mongo localhost:{{ port }} -u {{ mongodb_admin_user }} -p {{ mongodb_admin_password }} --authenticationDatabase "admin" {{ ansible_env.HOME }}/opt/confile/{{ replica_name }}.js 
+  command: mongo localhost:{{ now_item.value.port }} -u {{ mongodb_admin_user }} -p {{ mongodb_admin_password }} --authenticationDatabase "admin" {{ ansible_env.HOME }}/opt/confile/{{ now_item.value.replica_name }}.js 
   when: set_config
+  register: initialize
 
-- name: Set server SlaveOk
-  command: mongo localhost:{{ port }} -u {{ mongodb_user }} -p {{ mongodb_password }} --eval "printjson(db.getMongo().setSlaveOk())"
-  when: not set_config
-  register: set_slave
-
-- debug: "var=set_slave"
-
-- name: Check master server
-  command: mongo localhost:{{ port }} -u {{ mongodb_user }} -p {{ mongodb_password }} --eval "printjson(db.isMaster())"
-  register: is_master
-
-- debug: "var=is_master"
+- debug: "var=initialize"

@@ -5,7 +5,7 @@
 
 # Where and how to store data.
 storage:
-  dbPath: {{ db_path }}
+  dbPath: {{ now_item.value.db_path }}
   directoryPerDB: true
   journal:
     enabled: true
@@ -17,12 +17,12 @@ storage:
 systemLog:
   destination: file
   logAppend: true
-  path: /home/vagrant/opt/confile/mongodb/mongod-{{ replica_name }}.log
+  path: /home/vagrant/opt/confile/mongodb/mongod-{{ now_item.value.replica_name }}.log
 
 # network interfaces
 net:
-  port: {{ port }}
-  bindIp: {{ domain }}
+  port: {{ now_item.value.port }}
+  bindIp: {{ now_item.value.domain }}
 
 
 processManagement:
@@ -35,10 +35,10 @@ security:
 
 replication:
     oplogSizeMB: 10240
-    replSetName: "{{ replica_name }}"
+    replSetName: "{{ now_item.value.replica_name }}"
 
 sharding:
-    clusterRole: "{{ cluster_role }}"
+    clusterRole: "{{ now_item.value.cluster_role }}"
 {% endif %}
 
 #operationProfiling:

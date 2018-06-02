@@ -2,7 +2,7 @@
 - name: Render mongo replicat_set config and wait for replica_up
   template: 
     src: mongod.conf.j2
-    dest: "{{ ansible_env.HOME }}/opt/confile/mongod-{{ replica_name }}.conf"
+    dest: "{{ ansible_env.HOME }}/opt/confile/mongod-{{ now_item.value.replica_name }}.conf"
   listen: render config for security replica_set
 # - name: Set master server
 #   command: mongo localhost:{{ port }}/{{ db_name }} --eval "printjson(db.isMaster())"

@@ -1,4 +1,21 @@
 ---
+- name: Get server from configure
+  set_fact:
+    now_item: "{{ item }}"
+  with_dict: "{{ rs_conf }}"
+  when: inventory_hostname == item.key
+
+- name: debug value handler v2
+  debug: 
+    var: now_item
+
+- name: debug value handler v3 
+  debug:
+    var: 
+    - inventory_hostname
+    - ansible_hostname
+    - hostvars
+
 - name: Create directory
   file: path={{ item }} state=directory mode=0777
   with_items:

@@ -1,20 +1,35 @@
-replica_set:
-  replica_sa:
-    atom1:
-      id: 0
-      address: "192.168.33.10"
-      port: 27018
-    atom2:
-      id: 1
-      address: "192.168.33.11"
-      port: 27018
-  replica_sb:
-    atom3:
-      id: 0
-      address: "192.168.33.10"
-      port: 27019
-    atom4:
-      id: 1
-      address: "192.168.33.11"
-      port: 27019
-              
+replica_sa:
+  atom1:
+    address: "192.168.33.10"
+    port: 27018
+    db_name: "test"
+    db_path: "/data/db/rs-a"
+    replica_name: "replica_sa"
+    domain: "0.0.0.0"
+    cluster_role: "shardsvr"
+  atom2:
+    address: "192.168.33.11"
+    port: 27018
+    db_name: "test"
+    db_path: "/data/db/rs-a"
+    replica_name: "replica_sa"
+    domain: "0.0.0.0"
+    cluster_role: "shardsvr"
+
+replica_sb:
+  atom1:
+    address: "192.168.33.10"
+    port: 27019
+    db_name: "test"
+    db_path: "/data/db/rs-b"
+    replica_name: "replica_sb"
+    domain: "0.0.0.0"
+    cluster_role: "shardsvr"
+  atom2:
+    address: "192.168.33.11"
+    port: 27019
+    db_name: "test"
+    db_path: "/data/db/rs-b"
+    replica_name: "replica_sb"
+    domain: "0.0.0.0"
+    cluster_role: "shardsvr"
