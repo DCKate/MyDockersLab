@@ -1,0 +1,27 @@
+---
+- name: Clean rs_server_config
+  set_fact:
+    rs_server_config: []
+
+- name: Generate server unit config for replica_set 
+  set_fact:
+    rs_server_config: '{{ rs_server_config }}+[{"_id":{{ item.value.id }},"host":"{{ item.value.address }}:{{ item.value.port }}","priority":{{ item.value.priority }}}]'
+  with_dict:
+    - "{{ rs_conf }}"
+
+- debug: "var=rs_server_config"
+
+- name: Combine server for replica_set 
+  set_fact:
+    rs_config: '{{ rs_server_config | to_json }}'
+
+- name: Render replicat_set config and wait for calling rs.initiate
+  template: 
+    src: replica.js.j2
+    dest: "{{ ansible_env.HOME }}/opt/confile/{{ now_item.value.replica_name }}.js"
+
+- name: Initialize the replication set
+  command: mongo localhost:{{ now_item.value.port }} --authenticationDatabase "admin" {{ ansible_env.HOME }}/opt/confile/{{ now_item.value.replica_name }}.js 
+  register: initialize
+
+- debug: "var=initialize"

@@ -1,0 +1,7 @@
+rs.initiate()
+db=connect("localhost:{{ now_item.value.port }}/admin")
+db.createUser({user:"{{ mongodb_admin_user }}",pwd:"{{ mongodb_admin_password }}",roles:[{ db:"admin", role:"userAdminAnyDatabase" },{ db:"admin", role:"root" }]})
+db.auth("{{ mongodb_admin_user }}","{{ mongodb_admin_password }}")
+{% for item in rs_server_config %}
+rs.add( { host: "{{ item.host }}", priority:{{ item.priority }} } )
+{% endfor %}

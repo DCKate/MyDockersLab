@@ -19,18 +19,12 @@
   with_items:
     - { src: mongo-keyfile, name: mongo-keyfile , mode: "0600" }
 
-- name: Create user for MongoDB
-  include: create_user.yml
-
-- name: Set varible to enable auth
-  set_fact: 
-    enable_service: true
-
 - name: Render mongo replicat_set config 
   template: 
     src: mongod.conf.j2
     dest: "{{ ansible_env.HOME }}/opt/confile/mongod-{{ now_item.value.replica_name }}.conf"
 
-- name: Start replica set for MongoDB to set user
+- name: Start replica set
   command: mongod --config  {{ ansible_env.HOME }}/opt/confile/mongod-{{ now_item.value.replica_name }}.conf
+
 

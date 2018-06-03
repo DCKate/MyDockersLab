@@ -24,11 +24,9 @@ net:
   port: {{ now_item.value.port }}
   bindIp: {{ now_item.value.domain }}
 
-
 processManagement:
     fork: true
 
-{% if enable_service %}
 security:
     keyFile: "{{ ansible_env.HOME }}/opt/confile/mongo-keyfile"
     authorization: "enabled"
@@ -39,7 +37,6 @@ replication:
 
 sharding:
     clusterRole: "{{ now_item.value.cluster_role }}"
-{% endif %}
 
 #operationProfiling:
 

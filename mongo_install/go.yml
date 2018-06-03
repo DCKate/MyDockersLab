@@ -4,34 +4,29 @@
   roles:
    - role: common
 
+# - name: check mongo status
+#   vars:
+#     rs_conf: "{{ replica_sa }}"
+#   hosts: mongo
+#   roles:
+#    - role: replica_check
+
 - name: RS_SAAA -- Replica
   vars:
     rs_conf: "{{ replica_sa }}"
+    rs_server_config: []
   hosts: replica_sa
   roles:
-   - role: replica
+   - role: replica_build
+   - role: replica_up
 
 - name: RS_SBBB -- Replica
   vars:
     rs_conf: "{{ replica_sb }}"
-  hosts: replica_sb
-  roles:
-   - role: replica
-
-- name: RS_SAAA -- Replica UP
-  vars:
-    rs_conf: "{{ replica_sa }}"
-    rs_server_config: []
-  hosts: replica_sa
-  roles:
-   - role: replica_up
-
-- name: RS_SBBB -- Replica UP
-  vars:
-    rs_conf: "{{ replica_sb }}"
     rs_server_config: []
   hosts: replica_sb
   roles:
+   - role: replica_build
    - role: replica_up
 
 - name: local test use
@@ -42,10 +37,3 @@
   roles:
    - role: localtest
 
-# - name: local test use 2
-#   vars:
-#     rs_conf: "{{ replica_sb }}"
-#   gather_facts: true
-#   hosts: localserver
-#   roles:
-#    - role: localtest

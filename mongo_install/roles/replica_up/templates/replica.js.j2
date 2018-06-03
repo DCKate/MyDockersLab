@@ -1,4 +1,6 @@
-rs.initiate()
-{% for item in rs_server_config %}
-rs.add( { host: "{{ item }}"} )
-{% endfor %}
+config={ 
+    "_id":"{{ now_item.value.replica_name }}", 
+    "members":{{ rs_config }}
+}
+rs.initiate(config)
+rs.status()

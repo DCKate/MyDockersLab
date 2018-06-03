@@ -1,5 +1,6 @@
 replica_sa:
   atom1:
+    id: 0
     address: "192.168.33.10"
     port: 27018
     db_name: "test"
@@ -7,7 +8,9 @@ replica_sa:
     replica_name: "replica_sa"
     domain: "0.0.0.0"
     cluster_role: "shardsvr"
+    priority: 1
   atom2:
+    id: 1
     address: "192.168.33.11"
     port: 27018
     db_name: "test"
@@ -15,9 +18,11 @@ replica_sa:
     replica_name: "replica_sa"
     domain: "0.0.0.0"
     cluster_role: "shardsvr"
+    priority: 1
 
 replica_sb:
   atom1:
+    id: 0
     address: "192.168.33.10"
     port: 27019
     db_name: "test"
@@ -25,7 +30,9 @@ replica_sb:
     replica_name: "replica_sb"
     domain: "0.0.0.0"
     cluster_role: "shardsvr"
+    priority: 1
   atom2:
+    id: 1
     address: "192.168.33.11"
     port: 27019
     db_name: "test"
@@ -33,3 +40,4 @@ replica_sb:
     replica_name: "replica_sb"
     domain: "0.0.0.0"
     cluster_role: "shardsvr"
+    priority: 1

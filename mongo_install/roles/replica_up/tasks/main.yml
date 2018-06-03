@@ -1,38 +1,70 @@
 ---
-# - name: Get server from configure
-#   set_fact:
-#     rs_items: "{{ rs_items|default({}) | combine( rs_conf.value ) }}"
-#   with_dict: "{{ rs_conf }}"
-#   # when: replica_name == item.key
-
-# - debug: "var=rs_items"
 - name: Get server from configure
   set_fact:
     now_item: "{{ item }}"
   with_dict: "{{ rs_conf }}"
   when: inventory_hostname == item.key
 
-- name: Clean rs_server_config
-  set_fact:
-    rs_server_config: []
-
-- name: Generate server unit config for replica_set 
-  set_fact:
-    rs_server_config: '{{ rs_server_config }}+["{{ item.value.address }}:{{ item.value.port }}"]'
-  with_dict:
-    - "{{ rs_conf }}"
-
-- debug: "var=rs_server_config"
-
-- name: Render replicat_set config and wait for calling rs.initiate
-  template: 
-    src: replica.js.j2
-    dest: "{{ ansible_env.HOME }}/opt/confile/{{ now_item.value.replica_name }}.js"
+- name: Start replica set
+  include: set_up_config.yml
   when: set_config
 
-- name: Initialize the replication set
-  command: mongo localhost:{{ now_item.value.port }} -u {{ mongodb_admin_user }} -p {{ mongodb_admin_password }} --authenticationDatabase "admin" {{ ansible_env.HOME }}/opt/confile/{{ now_item.value.replica_name }}.js 
-  when: set_config
-  register: initialize
+- name: Wait 10 seconds for decide primary server 
+  command: mongo localhost:{{ now_item.value.port }} --eval "printjson(rs.status())"
+  register: rs_status
+  until: rs_status.stdout.find("PRIMARY") != -1
+  retries: 6
+  delay: 10
 
-- debug: "var=initialize"
+- name: Check master server
+  command: mongo localhost:{{ now_item.value.port }} --eval "printjson(db.isMaster())"
+  register: is_master
+  
+- debug: "msg={{is_master.stdout}}"
+
+- name: find master server
+  set_fact:
+    myvalue: "{{ is_master.stdout | regex_search(regexp,'\\1') }}"
+  vars:
+    regexp: 'ismaster[\\":\s]+([a-z]{0,5}),'
+
+- debug: var=myvalue
+
+- name: Create root user for MongoDB 
+  mongodb_user:
+    database: admin
+    login_port: "{{ now_item.value.port }}"
+    name: "{{ mongodb_admin_user }}"
+    password: "{{ mongodb_admin_password }}"
+    roles:
+      - { db: "admin", role: "userAdminAnyDatabase" }
+      - { db: "admin", role: "root" }
+    state: present
+  when: myvalue.0 == "true"
+
+- name: Create MongoDB user
+  mongodb_user:
+    login_user: "{{ mongodb_admin_user }}"
+    login_password: "{{ mongodb_admin_password }}"
+    login_port: "{{ now_item.value.port }}"
+    database: "{{ now_item.value.db_name }}"
+    name: "{{ mongodb_user }}"
+    password: "{{ mongodb_password }}"
+    roles:
+      - { db: "{{ now_item.value.db_name }}", role: "readWrite" }
+    state: present
+  when: myvalue.0 == "true"
+
+# - name: Create set slave script 
+#   copy:
+#     content: "rs.slaveOk()"
+#     dest: "{{ ansible_env.HOME }}/opt/confile/set_slave.js"
+#   when: myvalue.0 == "false"
+
+# - name: Set server SlaveOk
+#   command: mongo localhost:{{ now_item.value.port }}/{{ now_item.value.db_name }} -u {{ mongodb_user }} -p {{ mongodb_password }} {{ ansible_env.HOME }}/opt/confile/set_slave.js
+#   register: slaveok
+#   when: myvalue.0 == "false"
+
+# - debug: "var=slaveok"
+#   when: myvalue.0 == "false"
