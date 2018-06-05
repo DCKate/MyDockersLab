@@ -68,8 +68,6 @@ router_a:
   name: "router_a"
   address: "192.168.33.10"
   port: 27017
-  db_name: "router"
-  db_path: "/data/db/router_a"
   domain: "0.0.0.0"
   admin_user: "kate"
   admin_password: "goodgood"
