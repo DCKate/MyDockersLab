@@ -1,0 +1,65 @@
+---
+- name: Create directory
+  file: path={{ item }} state=directory mode=0777
+  with_items:
+    - "{{ ansible_env.HOME }}/opt/confile/mongodb/"
+    - "{{ rs_conf.db_path }}"
+  become: yes
+
+- name: Copy key file for mongo
+  copy: src=files/{{ item.src }} dest={{ ansible_env.HOME }}/opt/confile/{{ item.name }} mode={{ item.mode }}
+  with_items:
+    - { src: mongo-keyfile, name: mongo-keyfile , mode: "0600" }
+
+- name: debug value handler v1
+  debug: 
+    var: rs_conf
+
+- name: Generate configure for shard
+  set_fact:
+    config_db: "{{ rs_conf.config_replset.config_replset_name }}/{{ rs_conf.config_replset.address | join(',') }}"
+
+- name: debug value handler v2
+  debug: 
+    var: config_db
+
+- name: Clean config for shard 
+  set_fact:
+    config_shards: []
+
+- name: Generate variable for shard script
+  set_fact:
+    config_shards: '{{ config_shards }}+["{{ item.replset_name }}/{{ item.address | join(",") }}"]'
+  with_items:
+    "{{ rs_conf.replica_sets }}"
+
+- name: debug value handler v3
+  debug: 
+    var: config_shards
+
+- name: Render mongo router config 
+  template: 
+    src: "{{ item.src }}"
+    dest: "{{ ansible_env.HOME }}/opt/confile/{{ item.dest }}"
+  with_items:
+    - { src: "mongos.conf.j2",dest: "mongos-{{ rs_conf.name }}.conf"}
+    - { src: "router.js.j2",dest: "router.js"}
+
+- name: Start router
+  command: mongos --config  {{ ansible_env.HOME }}/opt/confile/mongos-{{ rs_conf.name }}.conf
+
+- name: Create root user for MongoDB 
+  mongodb_user:
+    database: admin
+    login_user: "{{ mongodb_admin_user }}"
+    login_password: "{{ mongodb_admin_password }}"
+    login_port: "{{ rs_conf.port }}"
+    name: "{{ rs_conf.admin_user }}"
+    password: "{{ rs_conf.admin_password }}"
+    roles:
+      - { db: "admin", role: "userAdminAnyDatabase" }
+      - { db: "admin", role: "clusterAdmin" }
+    state: present
+
+- name: Start router 
+  command: mongo localhost:{{ rs_conf.port }} -u {{ rs_conf.admin_user }} -p {{ rs_conf.admin_password }} --authenticationDatabase "admin" {{ ansible_env.HOME }}/opt/confile/mongos-{{ rs_conf.name }}.conf

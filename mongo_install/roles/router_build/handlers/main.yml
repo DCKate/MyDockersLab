@@ -1,0 +1,9 @@
+---
+# - name: Set slave server
+#   command: mongo localhost:{{ port }}/{{ db_name }} --eval "printjson(db.getMongo().setSlaveOk())"
+#   when: not is_master
+#   register: slaveout
+#   listen: set role for server
+#   become: yes
+
+# - debug: "msg=slaveout.stdout"

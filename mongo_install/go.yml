@@ -4,17 +4,9 @@
   roles:
    - role: common
 
-# - name: check mongo status
-#   vars:
-#     rs_conf: "{{ replica_sa }}"
-#   hosts: mongo
-#   roles:
-#    - role: replica_check
-
 - name: RS_SAAA -- Replica
   vars:
     rs_conf: "{{ replica_sa }}"
-    rs_server_config: []
   hosts: replica_sa
   roles:
    - role: replica_build
@@ -23,15 +15,29 @@
 - name: RS_SBBB -- Replica
   vars:
     rs_conf: "{{ replica_sb }}"
-    rs_server_config: []
   hosts: replica_sb
   roles:
    - role: replica_build
    - role: replica_up
 
+- name: RS_CONFIG
+  vars:
+    rs_conf: "{{ replica_ca }}"
+  hosts: shards
+  roles:
+   - role: replica_build
+   - role: replica_up
+
+- name: ROUTER
+  vars:
+    rs_conf: "{{ router_a }}"
+  hosts: routers
+  roles:
+   - role: router_build
+
 - name: local test use
   vars:
-    rs_conf: "{{ replica_sa }}"
+    rs_conf: "{{ router_a }}"
   gather_facts: true
   hosts: localserver
   roles:

@@ -41,3 +41,54 @@ replica_sb:
     domain: "0.0.0.0"
     cluster_role: "shardsvr"
     priority: 1
+
+replica_ca:
+  atom1:
+    id: 0
+    address: "192.168.33.10"
+    port: 27020
+    db_name: "test"
+    db_path: "/data/db/shard-a"
+    replica_name: "replica_ca"
+    domain: "0.0.0.0"
+    cluster_role: "configsvr"
+    priority: 1
+  atom2:
+    id: 1
+    address: "192.168.33.11"
+    port: 27020
+    db_name: "test"
+    db_path: "/data/db/shard-a"
+    replica_name: "replica_ca"
+    domain: "0.0.0.0"
+    cluster_role: "configsvr"
+    priority: 1
+
+router_a:
+  name: "router_a"
+  address: "192.168.33.10"
+  port: 27017
+  db_name: "router"
+  db_path: "/data/db/router_a"
+  domain: "0.0.0.0"
+  admin_user: "kate"
+  admin_password: "goodgood"
+  config_replset:
+    config_replset_name: "replica_ca"
+    address:
+      - "192.168.33.10:27020"
+      - "192.168.33.11:27020"
+  replica_sets:
+    - replset_name: "replica_sa"
+      address:
+        - "192.168.33.10:27018"
+        - "192.168.33.11:27018"
+    - replset_name: "replica_sb"
+      address:
+        - "192.168.33.10:27019"
+        - "192.168.33.11:27019"
+  enable_shards:
+    - database: "test"
+      collections:
+        - collection: "log"
+          shard_key: "created"
