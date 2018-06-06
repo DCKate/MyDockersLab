@@ -1,4 +1,14 @@
 ---
+- name: Clean server from configure
+  set_fact:
+    now_item: {}
+
+- name: Get server from configure
+  set_fact:
+    now_item: "{{ now_item | combine( item.value ) }}"
+  with_dict: "{{ rs_conf }}"
+  when: inventory_hostname == item.key
+
 - name: Create directory
   file: path={{ item }} state=directory mode=0777
   with_items:
@@ -12,11 +22,11 @@
 
 - name: debug value handler v1
   debug: 
-    var: rs_conf
+    var: now_item
 
 - name: Generate configure for shard
   set_fact:
-    config_db: "{{ rs_conf.config_replset.config_replset_name }}/{{ rs_conf.config_replset.address | join(',') }}"
+    config_db: "{{ now_item.config_replset.config_replset_name }}/{{ now_item.config_replset.address | join(',') }}"
 
 - name: debug value handler v2
   debug: 
@@ -30,7 +40,7 @@
   set_fact:
     config_shards: '{{ config_shards }}+["{{ item.replset_name }}/{{ item.address | join(",") }}"]'
   with_items:
-    "{{ rs_conf.replica_sets }}"
+    "{{ now_item.replica_sets }}"
 
 - name: debug value handler v3
   debug: 
@@ -41,24 +51,24 @@
     src: "{{ item.src }}"
     dest: "{{ ansible_env.HOME }}/opt/confile/{{ item.dest }}"
   with_items:
-    - { src: "mongos.conf.j2",dest: "mongos-{{ rs_conf.name }}.conf"}
+    - { src: "mongos.conf.j2",dest: "mongos-{{ now_item.name }}.conf"}
     - { src: "router.js.j2",dest: "router.js"}
 
 - name: Start router
-  command: mongos --config  {{ ansible_env.HOME }}/opt/confile/mongos-{{ rs_conf.name }}.conf
+  command: mongos --config  {{ ansible_env.HOME }}/opt/confile/mongos-{{ now_item.name }}.conf
 
 - name: Create root user for MongoDB 
   mongodb_user:
     database: admin
     login_user: "{{ mongodb_admin_user }}"
     login_password: "{{ mongodb_admin_password }}"
-    login_port: "{{ rs_conf.port }}"
-    name: "{{ rs_conf.admin_user }}"
-    password: "{{ rs_conf.admin_password }}"
+    login_port: "{{ now_item.port }}"
+    name: "{{ now_item.admin_user }}"
+    password: "{{ now_item.admin_password }}"
     roles:
       - { db: "admin", role: "userAdminAnyDatabase" }
       - { db: "admin", role: "clusterAdmin" }
     state: present
 
-- name: Start router 
-  command: mongo localhost:{{ rs_conf.port }} -u {{ rs_conf.admin_user }} -p {{ rs_conf.admin_password }} --authenticationDatabase "admin" {{ ansible_env.HOME }}/opt/confile/mongos-{{ rs_conf.name }}.conf
+- name: run router jks
+  command: mongo localhost:{{ now_item.port }} -u {{ now_item.admin_user }} -p {{ now_item.admin_password }} --authenticationDatabase "admin" {{ ansible_env.HOME }}/opt/confile/router.js

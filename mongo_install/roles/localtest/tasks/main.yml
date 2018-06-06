@@ -1,10 +1,14 @@
 ---
 # if rs_conf is replica group
-# - name: Get server from configure
-#   set_fact:
-#     now_item: "{{ item }}"
-#   with_dict: "{{ rs_conf }}"
-#   when: inventory_hostname == item.key
+- name: Clean server from configure
+  set_fact:
+    now_item: {}
+
+- name: Get server from configure
+  set_fact:
+    now_item: "{{ now_item|default({}) | combine( item.value ) }}"
+  with_dict: "{{ rs_conf }}"
+  when: inventory_hostname == item.key
 
 # - name: debug value handler v2
 #   debug: 
@@ -50,11 +54,11 @@
 # if rs_conf is router group
 - name: debug value handler v1
   debug: 
-    var: rs_conf
+    var: now_item
 
 - name: Generate configure for shard
   set_fact:
-    config_db: "{{ rs_conf.config_replset.config_replset_name }}/{{ rs_conf.config_replset.address | join(',') }}"
+    config_db: "{{ now_item.config_replset.config_replset_name }}/{{ now_item.config_replset.address | join(',') }}"
 
 - name: debug value handler v2
   debug: 
@@ -68,7 +72,7 @@
   set_fact:
     config_shards: '{{ config_shards }}+["{{ item.replset_name }}/{{ item.address | join(",") }}"]'
   with_items:
-    "{{ rs_conf.replica_sets }}"
+    "{{ now_item.replica_sets }}"
 
 - name: debug value handler v3
   debug: 

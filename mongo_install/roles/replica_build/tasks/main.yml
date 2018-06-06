@@ -19,6 +19,13 @@
   with_items:
     - { src: mongo-keyfile, name: mongo-keyfile , mode: "0600" }
 
+- name: Copy mongoc.js to set slave ok
+  copy: src=files/{{ item.src }} dest=/etc/{{ item.name }}
+  with_items:
+    - { src: mongorc.js, name: mongorc.js }
+  become: yes
+  when: now_item.value.cluster_role == "configsvr"
+
 - name: Render mongo replicat_set config 
   template: 
     src: mongod.conf.j2

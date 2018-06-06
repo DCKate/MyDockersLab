@@ -7,12 +7,12 @@
 systemLog:
   destination: file
   logAppend: true
-  path: /home/vagrant/opt/confile/mongodb/mongod-{{ rs_conf.name }}.log
+  path: /home/vagrant/opt/confile/mongodb/mongod-{{ now_item.name }}.log
 
 # network interfaces
 net:
-    port: {{ rs_conf.port }}
-    bindIp: {{ rs_conf.domain }}
+    port: {{ now_item.port }}
+    bindIp: {{ now_item.domain }}
     maxIncomingConnections: 5000
 
 processManagement:

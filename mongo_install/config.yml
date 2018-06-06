@@ -64,29 +64,30 @@ replica_ca:
     cluster_role: "configsvr"
     priority: 1
 
-router_a:
-  name: "router_a"
-  address: "192.168.33.10"
-  port: 27017
-  domain: "0.0.0.0"
-  admin_user: "kate"
-  admin_password: "goodgood"
-  config_replset:
-    config_replset_name: "replica_ca"
-    address:
-      - "192.168.33.10:27020"
-      - "192.168.33.11:27020"
-  replica_sets:
-    - replset_name: "replica_sa"
+router_set:
+  atom1:
+    name: "router_a"
+    address: "192.168.33.10"
+    port: 27017
+    domain: "0.0.0.0"
+    admin_user: "mongo"
+    admin_password: "goodgood"
+    config_replset:
+      config_replset_name: "replica_ca"
       address:
-        - "192.168.33.10:27018"
-        - "192.168.33.11:27018"
-    - replset_name: "replica_sb"
-      address:
-        - "192.168.33.10:27019"
-        - "192.168.33.11:27019"
-  enable_shards:
-    - database: "test"
-      collections:
-        - collection: "log"
-          shard_key: "created"
+        - "192.168.33.10:27020"
+        - "192.168.33.11:27020"
+    replica_sets:
+      - replset_name: "replica_sa"
+        address:
+          - "192.168.33.10:27018"
+          - "192.168.33.11:27018"
+      - replset_name: "replica_sb"
+        address:
+          - "192.168.33.10:27019"
+          - "192.168.33.11:27019"
+    enable_shards:
+      - database: "test"
+        collections:
+          - collection: "people"
+            shard_key: "created"

@@ -23,21 +23,21 @@
 - name: RS_CONFIG
   vars:
     rs_conf: "{{ replica_ca }}"
-  hosts: shards
+  hosts: configs
   roles:
    - role: replica_build
    - role: replica_up
 
 - name: ROUTER
   vars:
-    rs_conf: "{{ router_a }}"
+    rs_conf: "{{ router_set }}"
   hosts: routers
   roles:
    - role: router_build
 
 - name: local test use
   vars:
-    rs_conf: "{{ router_a }}"
+    rs_conf: "{{ router_set }}"
   gather_facts: true
   hosts: localserver
   roles:
