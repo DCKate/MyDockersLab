@@ -1,0 +1,32 @@
+---
+- name: debug value handler v1
+  debug: 
+    var: rs_items
+  listen: debug variable
+
+- name: debug value handler v2
+  debug: 
+    var: rs_server_config
+  listen: debug variable
+
+- name: debug value handler v3
+  debug: 
+    var: rs_config
+  listen: debug variable
+# - name: Set master server
+#   command: mongo localhost:{{ port }}/{{ db_name }} --eval "printjson(db.isMaster())"
+#   when: is_master
+#   register: masterout
+#   listen: set role for server
+#   become: yes
+
+# - debug: "msg=masterout.stdout"
+
+# - name: Set slave server
+#   command: mongo localhost:{{ port }}/{{ db_name }} --eval "printjson(db.getMongo().setSlaveOk())"
+#   when: not is_master
+#   register: slaveout
+#   listen: set role for server
+#   become: yes
+
+# - debug: "msg=slaveout.stdout"

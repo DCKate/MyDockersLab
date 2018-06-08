@@ -1,0 +1,47 @@
+# mongod.conf
+
+# for documentation of all options, see:
+#   http://docs.mongodb.org/manual/reference/configuration-options/
+
+# Where and how to store data.
+storage:
+  dbPath: {{ db_path }}
+  directoryPerDB: true
+  journal:
+    enabled: true
+#  engine:
+#  mmapv1:
+#  wiredTiger:
+
+# where to write logging data.
+systemLog:
+  destination: file
+  logAppend: true
+  path: /home/vagrant/opt/confile/mongodb/mongod-{{ replica_name }}.log
+
+# network interfaces
+net:
+  port: {{ port }}
+  bindIp: {{ domain }}
+
+processManagement:
+    fork: true
+
+security:
+    keyFile: "/opt/confile/mongo-keyfile"
+    authorization: "enabled"
+
+replication:
+    oplogSizeMB: 10240
+    replSetName: "{{ replica_name }}"
+
+sharding:
+    clusterRole: "{{ cluster_role }}"
+
+#operationProfiling:
+
+## Enterprise-Only Options:
+
+#auditLog:
+
+#snmp:

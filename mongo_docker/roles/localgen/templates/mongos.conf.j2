@@ -1,0 +1,31 @@
+# mongod.conf
+
+# for documentation of all options, see:
+#   http://docs.mongodb.org/manual/reference/configuration-options/
+
+# where to write logging data.
+systemLog:
+  destination: file
+  logAppend: true
+  path: /home/vagrant/opt/confile/mongodb/mongos-{{ name }}.log
+
+# network interfaces
+net:
+    port: {{ port }}
+    bindIp: {{ domain }}
+    maxIncomingConnections: 5000
+
+processManagement:
+    fork: true
+
+security:
+    keyFile: "/opt/confile/mongo-keyfile"
+
+sharding:
+    configDB: "{{ config_db }}"
+
+## Enterprise-Only Options:
+
+#auditLog:
+
+#snmp:
