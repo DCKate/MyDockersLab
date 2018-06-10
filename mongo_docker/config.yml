@@ -1,31 +1,108 @@
-mongo_set:  
-  router_set:
-    name: "router_a"
-    address: "192.168.33.10"
-    port: 27017
+replica_set:
+  - replica_name: "replica_sa"
+    db_path: "/data/db/rs-a"
+    port: 27018
     domain: "0.0.0.0"
-    admin_user: "mongo"
-    admin_password: "goodgood"
-    config_replset:
-      config_replset_name: "replica_ca"
-      address:
-        - "192.168.33.10:27020"
-        - "192.168.33.11:27020"
-    replica_sets:
-      - replset_name: "replica_sa"
-        mongod_user: "kk"
-        mongod_password: "goodgood"
-        address:
-          - "192.168.33.10:27018"
-          - "192.168.33.11:27018"
-      - replset_name: "replica_sb"
-        mongod_user: "kk"
-        mongod_password: "goodgood"
-        address:
-          - "192.168.33.10:27019"
-          - "192.168.33.11:27019"
-    enable_shards:
-      - database: "test"
-        collections:
-          - collection: "people"
-            shard_key: "created"
+    cluster_role: "shardsvr"
+  - replica_name: "replica_sb"
+    db_path: "/data/db/rs-b"
+    port: 27018
+    domain: "0.0.0.0"
+    cluster_role: "shardsvr"
+  - replica_name: "replica_ca"
+    db_path: "/data/db/rc-a"
+    port: 27019
+    domain: "0.0.0.0"
+    cluster_role: "configsvr"
+
+router_set:
+  name: "router"
+  port: 27017
+  domain: "0.0.0.0"
+  config_replica_name: "replica_ca"
+  config_address:
+    - "192.168.33.10:27019"
+    - "192.168.33.11:27019"
+  replica_sets:
+    - replica_name: "replica_sa"
+      configsvr: false
+      ids:
+       - 0
+       - 1
+      servers:
+        - "192.168.33.10:27018"
+        - "192.168.33.11:27018"
+    - replica_name: "replica_sb"
+      configsvr: false
+      ids:
+       - 0
+       - 1
+      servers:
+        - "192.168.33.10:27018"
+        - "192.168.33.11:27018"
+    - replica_name: "replica_ca"
+      configsvr: true
+      ids:
+       - 0
+       - 1
+      servers:
+        - "192.168.33.10:27019"
+        - "192.168.33.11:27019"
+  enable_shards:
+    - database: "test"
+      collections:
+        - collection: "people"
+          shard_key: "created"
+
+# replica_sets:
+#   - replset_name: "replica_sa"
+#     db_name: "test"
+#     db_path: "/data/db/rs-a"
+#     port: 27018
+#     domain: "0.0.0.0"
+#     cluster_role: "shardsvr"
+#     mongo_user: "kk"
+#     mongo_password: "goodgood"
+#     address:
+#       - "192.168.33.10"
+#       - "192.168.33.11"
+#   - replset_name: "replica_sb"
+#     mongo_user: "kk"
+#     mongo_password: "goodgood"
+#     db_name: "test"
+#     db_path: "/data/db/rs-b"
+#     port: 27018
+#     domain: "0.0.0.0"
+#     cluster_role: "shardsvr"
+#     address:
+#       - "192.168.33.10"
+#       - "192.168.33.11"
+#   - replset_name: "replica_ca"
+#     mongo_user: "kk"
+#     mongo_password: "goodgood"
+#     db_name: "test"
+#     db_path: "/data/db/rc-a"
+#     port: 27019
+#     domain: "0.0.0.0"
+#     cluster_role: "configsvr"
+#     address:
+#       - "192.168.33.10"
+#       - "192.168.33.11"
+
+# router_set:
+#   - name: "router_a"
+#     address: "192.168.33.10"
+#     port: 27017
+#     domain: "0.0.0.0"
+#     router_user: "mongo"
+#     router_password: "goodgood"
+#     config_replset:
+#       config_replset_name: "replica_ca"
+#       address:
+#         - "192.168.33.10:27020"
+#         - "192.168.33.11:27020"
+#     enable_shards:
+#       - database: "test"
+#         collections:
+#           - collection: "people"
+#             shard_key: "created"

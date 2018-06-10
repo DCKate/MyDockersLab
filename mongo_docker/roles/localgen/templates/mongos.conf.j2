@@ -7,12 +7,12 @@
 systemLog:
   destination: file
   logAppend: true
-  path: /home/vagrant/opt/confile/mongodb/mongos-{{ name }}.log
+  path: /opt/confile/mongodb/mongos-{{ router_set.name }}.log
 
 # network interfaces
 net:
-    port: {{ port }}
-    bindIp: {{ domain }}
+    port: {{ router_set.port }}
+    bindIp: {{ router_set.domain }}
     maxIncomingConnections: 5000
 
 processManagement:

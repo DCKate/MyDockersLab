@@ -1,0 +1,9 @@
+{% for shard in config_shards %}
+sh.addShard( "{{ shard }}")
+{% endfor %}
+{% for db_item in router_set.enable_shards %}
+sh.enableSharding("{{ db_item.database }}")
+{% for db_collection in db_item.collections %}
+sh.shardCollection("{{ db_item.database }}.{{ db_collection.collection }}", { "{{ db_collection.shard_key }}" : "hashed" } )
+{% endfor %}
+{% endfor %}

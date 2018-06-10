@@ -1,5 +1,9 @@
 config={ 
-    "_id":"{{ replica_name }}", 
+    "_id":"{{ now_item.value.replica_name }}", 
+{% if now_item.value.cluster_role == 'configsvr' %}
+    "configsvr": true,
+{% endif %}
     "members":{{ rs_config }}
 }
 rs.initiate(config)
+rs.status()

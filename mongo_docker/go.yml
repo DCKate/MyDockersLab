@@ -1,0 +1,6 @@
+---
+- name: local test use
+  hosts: localserver
+  roles:
+    - role: localgen
+

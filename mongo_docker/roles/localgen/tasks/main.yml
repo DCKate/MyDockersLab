@@ -6,10 +6,64 @@
     - "mongoc/files/"
     - "mongos/files/"
 
+# mongod conf
 - name: Render replicat_set config 
   template: 
-    src: replica.js.j2
-    dest: "testfolder/{{ item.0.name }}-{{ item.1 }}.js"
-  with_subelements:
-    - "{{ hosts_set }}"
-    - ip
+    src: mongod.conf.j2
+    dest: "mongod/files/mongod-{{ item.replica_name }}.conf"
+  with_items:
+    - "{{ replica_set }}"
+
+- name: Generate configure for shard
+  set_fact:
+    config_db: "{{ router_set.config_replica_name }}/{{ router_set.config_address | join(',') }}"
+
+# - name: Combine server for replica_set 
+#   set_fact:
+#     rs_config: '{{ rs_server_config | to_json }}'
+
+# - name: Render replicat_set config and wait for calling rs.initiate
+#   template: 
+#     src: replica.js.j2
+#     dest: "{{ ansible_env.HOME }}/opt/confile/{{ now_item.value.replica_name }}.js"
+
+# mongos config
+- name: Clean config for shard 
+  set_fact:
+    config_shards: []
+
+- name: Generate variable for shard script
+  set_fact:
+    config_shards: '{{ config_shards }}+["{{ item.replica_name }}/{{ item.servers | join(",") }}"]'
+  with_items:
+    - "{{ router_set.replica_sets }}"
+
+- name: debug value handler v3
+  debug: 
+    var: config_shards
+
+- name: Render router_set config 
+  template: 
+    src: "{{ item.src }}"
+    dest: "mongos/files/{{ item.dest }}"
+  with_items:
+    - { src: "mongos.conf.j2",dest: "mongos-{{ router_set.name }}.conf"}
+    - { src: "router.js.j2",dest: "router.js"}
+
+# - name: Generate variable for shard script
+#   set_fact:
+#     config_shards: '{{ config_shards }}+["{{ item.1.replset_name }}/{{ item.2.server | join(",") }}"]'
+#   with_subelements:
+#     - "{{ router_set }}"
+#     - replica_sets
+#     - servers
+
+
+# - name: Render replicat_set config and wait for calling rs.initiate
+#   template: 
+#     src: replica.js.j2
+#     dest: "testfolder/{{ item.0.name }}-{{ item.1 }}.js"
+#   with_subelements:
+#     - "{{ hosts_set }}"
+#     - ip
+
