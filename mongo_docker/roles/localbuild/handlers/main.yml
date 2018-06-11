@@ -1,18 +1,11 @@
 ---
-- name: debug value handler v1
-  debug: 
-    var: rs_items
-  listen: debug variable
+# - name: Save shard and config image # docker load --input ubuntu_14.04.tar
+#   command: docker save -o {{ item.replica_name }}.tar {{ item.replica_name }}:{{ version }} mongod/
+#   with_items:
+#     - "{{ replica_set }}"
 
-- name: debug value handler v2
-  debug: 
-    var: rs_server_config
-  listen: debug variable
-
-- name: debug value handler v3
-  debug: 
-    var: rs_config
-  listen: debug variable
+# - name: Save router image
+#   command: docker save -o {{ router_set.name }}.tar {{ router_set.name }}:{{ version }} mongos/
 # - name: Set master server
 #   command: mongo localhost:{{ port }}/{{ db_name }} --eval "printjson(db.isMaster())"
 #   when: is_master

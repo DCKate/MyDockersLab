@@ -7,7 +7,7 @@
 systemLog:
   destination: file
   logAppend: true
-  path: /opt/confile/mongodb/mongos-{{ router_set.name }}.log
+  path: {{ file_folder }}/mongodb/mongos-{{ router_set.name }}.log
 
 # network interfaces
 net:
@@ -19,7 +19,7 @@ processManagement:
     fork: true
 
 security:
-    keyFile: "/opt/confile/mongo-keyfile"
+    keyFile: "{{ file_folder }}/mongo-keyfile"
 
 sharding:
     configDB: "{{ config_db }}"

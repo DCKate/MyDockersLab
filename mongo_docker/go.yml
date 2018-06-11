@@ -3,4 +3,5 @@
   hosts: localserver
   roles:
     - role: localgen
+    - role: localbuild
 

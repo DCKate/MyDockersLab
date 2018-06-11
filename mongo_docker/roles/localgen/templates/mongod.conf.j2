@@ -17,7 +17,7 @@ storage:
 systemLog:
   destination: file
   logAppend: true
-  path: /opt/confile/mongodb/mongod-{{ item.replica_name }}.log
+  path: {{ file_folder }}/mongodb/mongod-{{ item.replica_name }}.log
 
 # network interfaces
 net:
@@ -28,7 +28,7 @@ processManagement:
     fork: true
 
 security:
-    keyFile: "/opt/confile/mongo-keyfile"
+    keyFile: "{{ file_folder }}/mongo-keyfile"
     authorization: "enabled"
 
 replication:
