@@ -15,8 +15,8 @@ net:
     bindIp: {{ router_set.domain }}
     maxIncomingConnections: 5000
 
-processManagement:
-    fork: true
+# processManagement:
+#     fork: true
 
 security:
     keyFile: "{{ file_folder }}/mongo-keyfile"

@@ -14,34 +14,63 @@
   debug: 
     var: host_group_conf
 
+- name: Load replica image
+  docker_image:
+    name: "{{ item.replica_name }}"
+    tag: "{{ version }}"
+    docker_host: "tcp://{{ hostvars[docker_host].ansible_ssh_host }}:2375"
+    load_path: mongo_image/{{ item.replica_name }}.tar
+  with_items:
+    - "{{ host_group_conf }}"
+
+- name: Load router image
+  docker_image:
+    name: "{{ router_set.name }}"
+    tag: "{{ version }}"
+    docker_host: "tcp://{{ hostvars[docker_host].ansible_ssh_host }}:2375"
+    load_path: mongo_image/{{ router_set.name }}.tar
+  when: router_set.name in group_names
+
 - name: Start container
   docker_container:
     name: "{{ item.replica_name }}"
     image: "{{ item.replica_name }}:{{ version }}"
     state: started
     restart: yes
+    # command: --config /etc/mongod.conf
     docker_host: "tcp://{{ hostvars[docker_host].ansible_ssh_host }}:2375"
     # links:
     #  - "myredis:aliasedredis"
     volumes:
-      - "mongo/db/{{inventory_hostname}}/{{ item.replica_name }}:{{ item.db_path }}"
-      - "mongo/log/{{inventory_hostname}}:{{ file_folder }}/mongodb/"
+      - "/mongo/db/{{ item.replica_name }}:{{ item.db_path }}"
+      - "/mongo/log/:{{ file_folder }}/mongodb/"
     ports:
       - "{{ item.port }}:{{ item.port }}"
-    with_items:
-      - "{{ host_group_conf }}"
-
+  with_items:
+    - "{{ host_group_conf }}"
+ 
 - name: Start router container
   docker_container:
     name: "{{ router_set.name }}"
     image: "{{ router_set.name }}:{{ version }}"
     state: started
     restart: yes
+    # command: --config /etc/mongos.conf
     docker_host: "tcp://{{ hostvars[docker_host].ansible_ssh_host }}:2375"
     # links:
     #  - "myredis:aliasedredis"
     volumes:
-      - "mongo/log/{{inventory_hostname}}:{{ file_folder }}/mongodb/"
+      - "/mongo/log/:{{ file_folder }}/mongodb/"
     ports:
       - "{{ router_set.port }}:{{ router_set.port }}"
   when: router_set.name in group_names
+
+- name: Docker run script for replica
+  command: docker exec -it {{ item.replica_name }} mongo localhost:{{ item.port }} {{ file_folder }}/{{ item.replica_name }}.js
+  with_items:
+    - "{{ host_group_conf }}"
+  when: item.replica_name in run_script
+
+- name: Docker run script for router
+  command: docker exec -it {{ router_set.name }} mongo localhost:{{ router_set.port }} {{ file_folder }}/router.js
+  when: router_set.name in run_script

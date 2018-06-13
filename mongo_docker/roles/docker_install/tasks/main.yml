@@ -20,7 +20,7 @@
   pip: name={{ item }}
   with_items:
     - docker-py
-    - docker-compose
+    # - docker-compose
   become: yes
 
 - name: Add key

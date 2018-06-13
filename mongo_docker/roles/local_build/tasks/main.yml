@@ -18,10 +18,12 @@
   command: docker save -o mongo_image/{{ item.replica_name }}.tar {{ item.replica_name }}:{{ version }}
   with_items:
     - "{{ replica_set }}"
+  register: save_replica
   when: replica_result is succeeded
 
 - name: Save router image
   command: docker save -o mongo_image/{{ router_set.name }}.tar {{ router_set.name }}:{{ version }} 
+  register: save_router
   when: replica_result is succeeded
 
 - name: Remove directory
@@ -29,3 +31,13 @@
   with_items:
     - "mongod/"
     - "mongos/"
+
+- name: Remove shard and config image
+  command: docker rmi {{ item.replica_name }}:{{ version }}
+  with_items:
+    - "{{ replica_set }}"
+  when: save_replica is succeeded
+
+- name: Remove router image
+  command: docker rmi {{ router_set.name }}:{{ version }} 
+  when: save_router is succeeded

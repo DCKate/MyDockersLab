@@ -6,12 +6,12 @@ replica_set:
     cluster_role: "shardsvr"
   - replica_name: "replica_sb"
     db_path: "/data/db/rs-b"
-    port: 27018
+    port: 27019
     domain: "0.0.0.0"
     cluster_role: "shardsvr"
   - replica_name: "replica_config"
     db_path: "/data/db/rc-a"
-    port: 27019
+    port: 27020
     domain: "0.0.0.0"
     cluster_role: "configsvr"
 
@@ -28,13 +28,13 @@ router_set:
     - replica_name: "replica_sb"
       configsvr: false
       servers:
-        - "192.168.33.10:27018"
-        - "192.168.33.11:27018"
+        - "192.168.33.10:27019"
+        - "192.168.33.11:27019"
     - replica_name: "replica_config"
       configsvr: true
       servers:
-        - "192.168.33.10:27019"
-        - "192.168.33.11:27019"
+        - "192.168.33.10:27020"
+        - "192.168.33.11:27020"
   enable_shards:
     - database: "test"
       collections:

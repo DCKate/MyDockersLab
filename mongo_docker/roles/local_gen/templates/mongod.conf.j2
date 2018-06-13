@@ -24,8 +24,8 @@ net:
   port: {{ item.port }}
   bindIp: {{ item.domain }}
 
-processManagement:
-    fork: true
+# processManagement:
+#     fork: true
 
 security:
     keyFile: "{{ file_folder }}/mongo-keyfile"
