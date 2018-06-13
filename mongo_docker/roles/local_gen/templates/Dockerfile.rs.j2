@@ -1,0 +1,8 @@
+FROM {{ mongo_img }}
+
+RUN mkdir -p {{ file_folder }}/mongodb/ 
+COPY files/mongo-keyfile {{ file_folder }}/
+COPY files/{{ item.replica_name }}.js /etc/
+COPY files/mongod-{{ item.replica_name }}.conf /etc/
+RUN chown -R 999 {{ file_folder }}/
+EXPOSE {{ item.port }}

@@ -1,0 +1,16 @@
+---
+- name: Install docker
+  hosts: docker_go
+  roles:
+    - role: docker_install
+
+- name: local test use
+  hosts: localserver
+  roles:
+    - role: local_gen
+    - role: local_build
+
+- name: local test use
+  hosts: mongo
+  roles:
+    - role: docker_up

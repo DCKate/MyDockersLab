@@ -1,0 +1,31 @@
+# mongod.conf
+
+# for documentation of all options, see:
+#   http://docs.mongodb.org/manual/reference/configuration-options/
+
+# where to write logging data.
+systemLog:
+  destination: file
+  logAppend: true
+  path: {{ file_folder }}/mongodb/mongos-{{ router_set.name }}.log
+
+# network interfaces
+net:
+    port: {{ router_set.port }}
+    bindIp: {{ router_set.domain }}
+    maxIncomingConnections: 5000
+
+processManagement:
+    fork: true
+
+security:
+    keyFile: "{{ file_folder }}/mongo-keyfile"
+
+sharding:
+    configDB: "{{ config_db }}"
+
+## Enterprise-Only Options:
+
+#auditLog:
+
+#snmp:

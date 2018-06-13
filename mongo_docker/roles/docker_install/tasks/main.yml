@@ -1,0 +1,56 @@
+# Install docker on ubuntu 16.04
+# according to: https://docs.docker.com/engine/installation/linux/ubuntulinux/
+---
+- name: Update apt
+  apt: update_cache=yes
+  become: yes
+
+- name:  Install the package
+  apt: name={{ item }} state=present
+  become: yes
+  with_items:
+    - python-dev
+    - python-pip
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - software-properties-common
+
+- name: pip install
+  pip: name={{ item }}
+  with_items:
+    - docker-py
+    - docker-compose
+  become: yes
+
+- name: Add key
+  shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+- name: Add repository 16.04
+  apt_repository: repo='deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable' state=present
+  become: yes
+
+- name: Update apt again
+  apt: update_cache=yes
+  become: yes
+
+- name: Install the latest version of Docker CE
+  apt: name=docker-ce
+  become: yes
+
+- name: Copy config for docker
+  copy: src=files/{{ item.src }} dest={{ item.name }} mode=0644 owner=root group=root
+  with_items:
+    - { src: docker.default, name: /etc/default/docker }
+    - { src: docker.service, name: /lib/systemd/system/docker.service }
+  become: yes
+
+- name: Start service docker, if not running
+  service:
+    name: docker
+    state: restarted
+  become: yes
+
+- name: start service
+  systemd: name=docker state=restarted daemon_reload=yes enabled=yes
+  become: yes

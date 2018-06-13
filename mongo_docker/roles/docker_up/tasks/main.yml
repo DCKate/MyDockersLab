@@ -1,0 +1,47 @@
+---
+- name: Clean config for shard 
+  set_fact:
+    host_group_conf: []
+
+- name: Generate variable for shard script
+  set_fact:
+    host_group_conf: '{{ host_group_conf }}+[{{ item }}]'
+  when: item.replica_name in group_names
+  with_items:
+    "{{ replica_set }}"
+
+- name: debug value handler v2
+  debug: 
+    var: host_group_conf
+
+- name: Start container
+  docker_container:
+    name: "{{ item.replica_name }}"
+    image: "{{ item.replica_name }}:{{ version }}"
+    state: started
+    restart: yes
+    docker_host: "tcp://{{ hostvars[docker_host].ansible_ssh_host }}:2375"
+    # links:
+    #  - "myredis:aliasedredis"
+    volumes:
+      - "mongo/db/{{inventory_hostname}}/{{ item.replica_name }}:{{ item.db_path }}"
+      - "mongo/log/{{inventory_hostname}}:{{ file_folder }}/mongodb/"
+    ports:
+      - "{{ item.port }}:{{ item.port }}"
+    with_items:
+      - "{{ host_group_conf }}"
+
+- name: Start router container
+  docker_container:
+    name: "{{ router_set.name }}"
+    image: "{{ router_set.name }}:{{ version }}"
+    state: started
+    restart: yes
+    docker_host: "tcp://{{ hostvars[docker_host].ansible_ssh_host }}:2375"
+    # links:
+    #  - "myredis:aliasedredis"
+    volumes:
+      - "mongo/log/{{inventory_hostname}}:{{ file_folder }}/mongodb/"
+    ports:
+      - "{{ router_set.port }}:{{ router_set.port }}"
+  when: router_set.name in group_names

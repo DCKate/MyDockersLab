@@ -1,0 +1,42 @@
+replica_set:
+  - replica_name: "replica_sa"
+    db_path: "/data/db/rs-a"
+    port: 27018
+    domain: "0.0.0.0"
+    cluster_role: "shardsvr"
+  - replica_name: "replica_sb"
+    db_path: "/data/db/rs-b"
+    port: 27018
+    domain: "0.0.0.0"
+    cluster_role: "shardsvr"
+  - replica_name: "replica_config"
+    db_path: "/data/db/rc-a"
+    port: 27019
+    domain: "0.0.0.0"
+    cluster_role: "configsvr"
+
+router_set:
+  name: "router"
+  port: 27017
+  domain: "0.0.0.0"
+  replica_conf:
+    - replica_name: "replica_sa"
+      configsvr: false
+      servers:
+        - "192.168.33.10:27018"
+        - "192.168.33.11:27018"
+    - replica_name: "replica_sb"
+      configsvr: false
+      servers:
+        - "192.168.33.10:27018"
+        - "192.168.33.11:27018"
+    - replica_name: "replica_config"
+      configsvr: true
+      servers:
+        - "192.168.33.10:27019"
+        - "192.168.33.11:27019"
+  enable_shards:
+    - database: "test"
+      collections:
+        - collection: "people"
+          shard_key: "created"
