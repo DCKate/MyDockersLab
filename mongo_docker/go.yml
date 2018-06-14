@@ -14,3 +14,8 @@
   hosts: mongo
   roles:
     - role: docker_up
+
+- name: local test use
+  hosts: docker_go
+  roles:
+    - role: docker_run_script

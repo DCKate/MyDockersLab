@@ -17,7 +17,7 @@ storage:
 systemLog:
   destination: file
   logAppend: true
-  path: {{ file_folder }}/mongodb/mongod-{{ item.replica_name }}.log
+  path: {{ file_folder }}/mongodb/logs/mongod-{{ item.replica_name }}.log
 
 # network interfaces
 net:

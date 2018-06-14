@@ -1,3 +1,9 @@
 file_folder: /kkfolder/prepare
-mongo_img: mongo:3.4.14-jessie
+
+mongodb_admin_user: kkk
+mongodb_admin_password: good_good
+
+mongodb_user: kk
+mongodb_password: kk_passwd
+
 version: v0.6.11

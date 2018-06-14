@@ -57,6 +57,7 @@
   with_items:
     - { src: "mongos.conf.j2",dest: "mongos-{{ router_set.name }}.conf"}
     - { src: "router.js.j2",dest: "router.js"}
+    - { src: "addUser.js.j2",dest: "addUser.js"}
 
 # dockerfile for shard and config server 
 - name: Render dockerfile for shard and config server

@@ -1,8 +1,18 @@
-FROM {{ mongo_img }}
+FROM ubuntu:16.04
 
-RUN mkdir -p {{ file_folder }}/mongodb/ 
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 0C49F3730359A14518585931BC711F9BA15703C6 \
+    && echo "deb [ arch=amd64,arm64 ] http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.4 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-3.4.list \
+    && apt-get -qq update \
+    && apt-get install -y mongodb-org \
+    && apt-get -qq install curl \
+    && mkdir -p {{ file_folder }}/mongodb/ \
+    && apt-get -qq install vim
+
 COPY files/mongo-keyfile {{ file_folder }}/
 COPY files/router.js {{ file_folder }}/
-COPY files/mongos-{{ item.name }}.conf /etc/mongo/mongos.conf
-RUN chown -R 999 {{ file_folder }}/
+COPY files/addUser.js {{ file_folder }}/
+COPY files/mongos-{{ item.name }}.conf {{ file_folder }}/mongodb/mongos.conf
+# RUN chown -R 999 {{ file_folder }}/
 EXPOSE {{ item.port }}
+
+CMD ["usr/bin/mongos","--config", "{{ file_folder }}/mongodb/mongos.conf"]

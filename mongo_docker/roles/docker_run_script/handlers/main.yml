@@ -1,9 +1,4 @@
 ---
-# - name: Save shard and config image # docker load --input ubuntu_14.04.tar
-#   command: docker save -o {{ item.replica_name }}.tar {{ item.replica_name }}:{{ version }} mongod/
-#   with_items:
-#     - "{{ replica_set }}"
-
 # - name: Save router image
 #   command: docker save -o {{ router_set.name }}.tar {{ router_set.name }}:{{ version }} mongos/
 # - name: Set master server

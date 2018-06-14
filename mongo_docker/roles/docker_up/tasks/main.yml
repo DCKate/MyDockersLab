@@ -37,13 +37,12 @@
     image: "{{ item.replica_name }}:{{ version }}"
     state: started
     restart: yes
-    # command: --config /etc/mongod.conf
     docker_host: "tcp://{{ hostvars[docker_host].ansible_ssh_host }}:2375"
     # links:
     #  - "myredis:aliasedredis"
     volumes:
       - "/mongo/db/{{ item.replica_name }}:{{ item.db_path }}"
-      - "/mongo/log/:{{ file_folder }}/mongodb/"
+      - "/mongo/log/:{{ file_folder }}/mongodb/logs/"
     ports:
       - "{{ item.port }}:{{ item.port }}"
   with_items:
@@ -55,22 +54,9 @@
     image: "{{ router_set.name }}:{{ version }}"
     state: started
     restart: yes
-    # command: --config /etc/mongos.conf
     docker_host: "tcp://{{ hostvars[docker_host].ansible_ssh_host }}:2375"
-    # links:
-    #  - "myredis:aliasedredis"
     volumes:
-      - "/mongo/log/:{{ file_folder }}/mongodb/"
+      - "/mongo/log:{{ file_folder }}/mongodb/logs/"
     ports:
       - "{{ router_set.port }}:{{ router_set.port }}"
   when: router_set.name in group_names
-
-- name: Docker run script for replica
-  command: docker exec -it {{ item.replica_name }} mongo localhost:{{ item.port }} {{ file_folder }}/{{ item.replica_name }}.js
-  with_items:
-    - "{{ host_group_conf }}"
-  when: item.replica_name in run_script
-
-- name: Docker run script for router
-  command: docker exec -it {{ router_set.name }} mongo localhost:{{ router_set.port }} {{ file_folder }}/router.js
-  when: router_set.name in run_script

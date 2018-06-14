@@ -1,0 +1,4 @@
+db=connect("localhost:{{ router_set.port }}/admin")
+db.createUser({user:"{{ mongodb_admin_user }}",pwd:"{{ mongodb_admin_password }}",roles:[{ db:"admin", role:"userAdminAnyDatabase" },{ db:"admin", role:"clusterAdmin" }]})
+db.auth("{{ mongodb_admin_user }}","{{ mongodb_admin_password }}")
+db.createUser({user:"{{ mongodb_user }}",pwd:"{{ mongodb_password }}",roles:[{ db:"test", role:"readWrite" }]})

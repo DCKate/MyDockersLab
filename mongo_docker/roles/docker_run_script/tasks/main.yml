@@ -1,0 +1,21 @@
+---
+- name: Docker run script for replica
+  command: docker exec -i {{ item.replica_name }} mongo localhost:{{ item.port }} {{ file_folder }}/{{ item.replica_name }}.js
+  with_items:
+    - "{{ replica_set }}"
+  when: item.replica_name in run_script
+  become: yes
+
+- name: Docker pause for replica ready
+  pause:
+    minutes: 2
+
+- name: Docker run script for router
+  command: docker exec -i {{ router_set.name }} mongo localhost:{{ router_set.port }} {{ file_folder }}/router.js
+  when: router_set.name in run_script
+  become: yes
+
+- name: Docker run script for router
+  command: docker exec -i {{ router_set.name }} mongo localhost:{{ router_set.port }} {{ file_folder }}/addUser.js
+  when: router_set.name in run_script
+  become: yes
