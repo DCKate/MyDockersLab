@@ -18,7 +18,14 @@
     dest: "mongod/files/mongod-{{ item.replica_name }}.conf"
   with_items:
     - "{{ replica_set }}"
-    
+
+- name: Render script for shard and config server to create user
+  template: 
+    src: "addUserRs.js.j2"
+    dest: "mongod/files/addUserRs-{{ item.replica_name }}.js"
+  with_items:
+    - "{{ replica_set }}"
+   
 # jinja2 referencd http://jinja.pocoo.org/docs/2.10/templates/#for
 - name: Render replicat_set script and wait for calling rs.initiate
   template: 

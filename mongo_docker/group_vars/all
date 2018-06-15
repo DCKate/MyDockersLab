@@ -1,4 +1,5 @@
 file_folder: /kkfolder/prepare
+version: v0.6.11
 
 mongodb_admin_user: kkk
 mongodb_admin_password: good_good
@@ -6,4 +7,6 @@ mongodb_admin_password: good_good
 mongodb_user: kk
 mongodb_password: kk_passwd
 
-version: v0.6.11
+mongodb_router_user: router
+mongodb_router_password: good_good
+

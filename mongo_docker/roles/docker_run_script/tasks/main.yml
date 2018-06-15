@@ -10,12 +10,31 @@
   pause:
     minutes: 2
 
-- name: Docker run script for router
-  command: docker exec -i {{ router_set.name }} mongo localhost:{{ router_set.port }} {{ file_folder }}/router.js
+# - name: Docker run script for replica to create user
+#   command: docker exec -i {{ item.replica_name }} mongo localhost:{{ item.port }} {{ file_folder }}/addUserRs.js
+#   with_items:
+#     - "{{ replica_set }}"
+#   when: item.replica_name in run_script
+#   become: yes
+
+- name: Docker create admin user for replica
+  command: docker exec -i {{ item.replica_name }} mongo localhost:{{ item.port }}/admin --eval "printjson(db.createUser({user:\"{{ mongodb_admin_user }}\",pwd:\"{{ mongodb_admin_password }}\",roles:[{ db:\"admin\", role:\"userAdminAnyDatabase\" }]}))"
+  with_items:
+    - "{{ replica_set }}"
+  when: item.replica_name in run_script
+  become: yes
+
+# - name: Docker run script for router to create user
+#   command: docker exec -i {{ router_set.name }} mongo localhost:{{ router_set.port }} {{ file_folder }}/addUser.js
+#   when: router_set.name in run_script
+#   become: yes
+
+- name: Docker create user for router
+  command: docker exec -i {{ router_set.name }} mongo localhost:{{ router_set.port }}/admin -u {{ mongodb_admin_user }} -p {{ mongodb_admin_password }} --authenticationDatabase "admin" --eval "printjson(db.createUser({user:\"{{ mongodb_router_user }}\",pwd:\"{{ mongodb_router_password }}\",roles:[{ db:\"admin\", role:\"clusterAdmin\" }]}))"
   when: router_set.name in run_script
   become: yes
 
 - name: Docker run script for router
-  command: docker exec -i {{ router_set.name }} mongo localhost:{{ router_set.port }} {{ file_folder }}/addUser.js
+  command: docker exec -i {{ router_set.name }} mongo localhost:{{ router_set.port }} -u {{ mongodb_router_user }} -p {{ mongodb_router_password }} --authenticationDatabase "admin" {{ file_folder }}/router.js
   when: router_set.name in run_script
   become: yes

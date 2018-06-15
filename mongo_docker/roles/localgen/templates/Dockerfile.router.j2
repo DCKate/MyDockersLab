@@ -1,8 +1,0 @@
-FROM {{ mongo_img }}
-
-RUN mkdir -p {{ file_folder }}/mongodb/ 
-COPY files/mongo-keyfile {{ file_folder }}/
-COPY files/router.js /etc/
-COPY files/mongos-{{ item.name }}.conf /etc/
-RUN chown -R 999 {{ file_folder }}/
-EXPOSE {{ item.port }}

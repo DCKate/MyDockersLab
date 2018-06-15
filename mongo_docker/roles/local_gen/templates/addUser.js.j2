@@ -1,4 +1,8 @@
-db=connect("localhost:{{ router_set.port }}/admin")
-db.createUser({user:"{{ mongodb_admin_user }}",pwd:"{{ mongodb_admin_password }}",roles:[{ db:"admin", role:"userAdminAnyDatabase" },{ db:"admin", role:"clusterAdmin" }]})
+conn = new Mongo("localhost:{{ router_set.port }}");
+db = conn.getDB("admin");
 db.auth("{{ mongodb_admin_user }}","{{ mongodb_admin_password }}")
-db.createUser({user:"{{ mongodb_user }}",pwd:"{{ mongodb_password }}",roles:[{ db:"test", role:"readWrite" }]})
+db.createUser({user:"{{ mongodb_router_user }}",pwd:"{{ mongodb_router_password }}",roles:[{ db:"admin", role:"clusterAdmin" }]})
+{% for db_item in router_set.enable_shards %}
+db = conn.getDB("{{ db_item.database }}");
+db.createUser({user:"{{ mongodb_user }}",pwd:"{{ mongodb_password }}",roles:[{ db:"{{ db_item.database }}", role:"readWrite" }]})
+{% endfor %}

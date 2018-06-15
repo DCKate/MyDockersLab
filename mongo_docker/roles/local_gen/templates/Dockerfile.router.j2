@@ -10,7 +10,7 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 0C49F3730359A14
 
 COPY files/mongo-keyfile {{ file_folder }}/
 COPY files/router.js {{ file_folder }}/
-COPY files/addUser.js {{ file_folder }}/
+# COPY files/addUser.js {{ file_folder }}/
 COPY files/mongos-{{ item.name }}.conf {{ file_folder }}/mongodb/mongos.conf
 # RUN chown -R 999 {{ file_folder }}/
 EXPOSE {{ item.port }}

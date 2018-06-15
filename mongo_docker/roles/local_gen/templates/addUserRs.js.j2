@@ -1,0 +1,5 @@
+conn = new Mongo("localhost:{{ item.port }}");
+db = conn.getDB("admin");
+db.createUser({user:"{{ mongodb_admin_user }}",pwd:"{{ mongodb_admin_password }}",roles:[{ db:"admin", role:"userAdminAnyDatabase" }]})
+db.auth("{{ mongodb_admin_user }}","{{ mongodb_admin_password }}")
+
