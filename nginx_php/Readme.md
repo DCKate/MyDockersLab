@@ -3,11 +3,34 @@
  $docker build --force-rm . -t nginx_php:1.0
  ```
 
- 2. run 
+ 2. create network
  ```
- $docker run -it --name php -p 55555:55555 nginx_php:1.0
+ $ docker network create small
+ ```
+ 2.1 connect network
+ Connect a running container to a network
+ ```
+ $ docker network connect multi-host-network container1
+ ```
+ Connect a container to a network when it starts
+ You can also use the docker run --network=<network-name> option to start a container and immediately connect it to a network.
+ ```
+ $ docker run -itd --network=multi-host-network busybox
+ ```
+ 3. run 
+ ```
+ $docker run -itd --network=small --name php -p 55555:55555 nginx_php:1.0
+ ```
+
+ 4. exec
+ ```
+ $docker exec -it -u ubuntu php bash
  ```
  
+ 5. run redis
+ ```
+ $docker run -v {{ docker_redis_folder }}:/data --network=small --name goredis -p 6379:6379 -d redis redis-server --appendonly yes
+ ```
 
 
 Note:
