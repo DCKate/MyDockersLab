@@ -23,6 +23,7 @@ COPY files/envrc /home/ubuntu/www/conf/envrc
 COPY files/mime.types /home/ubuntu/www/conf/mime.types
 COPY files/www.conf /etc/php/7.0/fpm/pool.d/www.conf
 COPY files/nginx.conf /home/ubuntu/www/conf/nginx.conf
+COPY files/mo.png /home/ubuntu/www/php/protected/
 COPY files/php /home/ubuntu/www/php
 COPY files/php_composer /home/ubuntu/www/php/php_composer
 COPY files/start.sh /home/ubuntu/www/start.sh
@@ -32,6 +33,7 @@ WORKDIR /home/ubuntu/www/php/php_composer/
 RUN curl -sS https://getcomposer.org/installer | php \
     && chown -R ubuntu /home/ubuntu/www/ \
     && chown -R www-data:www-data /home/ubuntu/www/php/sess \
+    && chown -R www-data:www-data /home/ubuntu/www/php/protected \
     && /sbin/sysctl -p
 USER ubuntu
 RUN php composer.phar install
@@ -39,4 +41,4 @@ USER root
     # && service php7.0-fpm start
 EXPOSE 55555
 
-CMD ["sh","/home/ubuntu/www/start.sh"]
+# CMD ["sh","/home/ubuntu/www/start.sh"]
