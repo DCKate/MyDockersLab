@@ -1,5 +1,8 @@
 <?php
+    header('Content-Type: application/vnd.apple.mpegurl');	
     require_once __DIR__ . '/pmodules/CacheModule.php';
+    session_start();
+    $sessionID=session_id();
     if (isset($_SERVER['TOKEN']))
     {
         $tok = $_SERVER['TOKEN'];
@@ -13,9 +16,23 @@
                 $obj = json_decode($json);
                 if (file_exists($obj->{'path'}))
                 {
-                    error_log("file_exist");
-                    readfile($obj->{'path'});
+                    $content="";
+                    $timestr = sprintf("%d",time());
+                    $handle = fopen($obj->{'path'}, "r");
+                    if ($handle) {
+                        while (($line = fgets($handle)) !== false) {
+                            if(preg_match("/\w.ts\s/i", $line)){
+                                $ticket = hash('crc32b',$timestr.$sessionID.trim($line));
+                                $content.=substr(trim($line),0,-3).".hls?ticket=".$ticket."&timestamp=".$timestr."\n";
+                            }else{
+                                $content.=trim($line)."\n";
+                            }
+                        }
+                        fclose($handle);
+                    }
+                    print $content;
                     return;
+                    
                 }
             }
         }

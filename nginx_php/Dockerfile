@@ -27,6 +27,7 @@ COPY files/mo.png /home/ubuntu/www/php/protected/
 COPY files/php /home/ubuntu/www/php
 COPY files/php_composer /home/ubuntu/www/php/php_composer
 COPY files/start.sh /home/ubuntu/www/start.sh
+ADD files/demo.tar.gz /home/ubuntu/www/php/protected/
 
 WORKDIR /home/ubuntu/www/php/php_composer/
 
