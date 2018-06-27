@@ -2,5 +2,16 @@
 1. Install:
 go get -u github.com/go-redis/redis
 
-2. Build:
+2. Build golang:
 env GOOS=linux GOARCH=amd64 go build -v -ldflags "-X main.version=v1.0.0" -o build
+
+3. docker build image and run
+docker build --force-rm . -t goweb:1.0   
+docker run -itd --network=small --name gogo -p 55555:55555 goweb:1.0
+
+note: 
+* generate m3u8 with ffmpeg
+ffmpeg -i sample.mp4 -c:v libx264 -c:a aac -strict -2 -hls_list_size 0 -hls_time 20 -f hls output.m3u8
+* demo.tar.gz could be found on nginx_php
+* localdemo.tar.gz is similar with demo.tar.
+* encdemo.tar.gz use the encryption with hls

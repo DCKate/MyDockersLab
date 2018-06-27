@@ -1,0 +1,51 @@
+reference:http://hlsbook.net/how-to-encrypt-hls-video-with-ffmpeg/
+
+* How to Encrypt Video for HLS
+Encryption is the process of encoding information in such a way that only authorised parties can read it.
+ The encryption process requires some kind of secret (key) together with an encryption algorithm.
+
+There are many different types of encryption algorithms but HLS only supports AES-128. 
+The Advanced Encryption Standard (AES) is an example of a block cipher, 
+which encrypts (and decrypts) data in fixed-size blocks. 
+It’s a symmetric key algorithm, 
+which means that the key that is used to encrypt data is also used to decrypt it. 
+AES-128 uses a key length of 128 bits (16 bytes).
+
+HLS uses AES in cipher block chaining (CBC) mode. 
+This means each block is encrypted using the cipher text of the preceding block, 
+but this gives us a problem: how do we encrypt the first block? 
+There is no block before it! 
+To get around this problem we use what is known as an initialisation vector (IV). 
+In this instance, it’s a 16-byte random value that is used to intialize the encryption process. 
+It doesn’t need to be kept secret for the encryption to be secure.
+
+a. use OpenSSL to create the key
+b. generate an IV. This step is optional. 
+(If no value is provided, the segment sequence number will be used instead.)
+c. To encrypt the video we need to tell ffmpeg what encryption key to use, 
+the URI of the key, and so on. 
+We do this with -hls_key_info_file option passing it the location of a key info file. 
+The file must be in the following format:
+
+Key URI
+Path to key file
+IV (optional)
+
+ex:
+https://hlsbook.net/enc.key
+enc.key
+ecd0d06eaf884d8226c33928e87efa33
+
+Step 
+```
+$ openssl rand 16 > enc.key
+$ openssl rand -hex 16
+ecd0d06eaf884d8226c33928e87efa33
+$ ffmpeg -y \
+    -i sample.mov \
+    -hls_time 9 \
+    -hls_key_info_file enc.keyinfo
+    -hls_playlist_type vod \
+    -hls_segment_filename "fileSequence%d.ts" \
+    prog_index.m3u8
+```
