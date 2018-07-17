@@ -18,7 +18,7 @@ COPY files/goweb.conf /home/ubuntu/www/conf/sites-enabled/goweb.conf
 COPY files/start.conf /etc/supervisor/conf.d/start.conf
 COPY files/enc.key /home/ubuntu/www/protected/key/
 COPY files/goweb /home/ubuntu/www/gbin/
-ADD source/goweb/protected/demo.tar.gz /home/ubuntu/www/protected/
+# ADD source/goweb/protected/demo.tar.gz /home/ubuntu/www/protected/
 ADD source/goweb/protected/localdemo.tar.gz /home/ubuntu/www/protected/
 ADD source/goweb/protected/encdemo.tar.gz /home/ubuntu/www/protected/
 

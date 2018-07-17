@@ -253,6 +253,10 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		{
 			getStaticFile(w, r)
 		}
+	default:
+		{
+			http.Error(w, `Invalid operation!`, http.StatusUnsupportedMediaType)
+		}
 	}
 }
 
